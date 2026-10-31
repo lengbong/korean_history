@@ -17,3 +17,7 @@ const EXAM_INFO = {
 
 const EXAM_UNITS = [];
 const EXAM_QUESTIONS = [];
+// 개념 노트 보강(흐름 이야기·시험 포인트·용어·사료·사진): 단원 id → { sections, tables, sources }
+const EXAM_PLUS = {};
+// 노트 사진과 출처: js/exam-images.js에서 채워요
+const EXAM_IMAGES = [];

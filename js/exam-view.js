@@ -172,13 +172,47 @@
   }
 
   // ---------- 개념 노트 ----------
+  // 노트 보강: 사진(js/exam-images.js)과 흐름 이야기·시험 포인트·용어·사료(js/exam-plus*.js)
+  const imgById = Object.fromEntries(EXAM_IMAGES.map(m => [m.id, m]));
+  const link = (href, text) => href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(text)}</a>` : esc(text);
+  const credit = m => `사진: ${esc(m.author)} · ${link(m.license_url, m.license)} · ${link(m.source, '위키미디어 공용')}`;
+
+  function figures(ids) {
+    const list = (ids || []).map(id => imgById[id]).filter(Boolean);
+    if (!list.length) return '';
+    return `<div class="note-figs">${list.map(m => `
+      <figure class="note-fig">
+        <button type="button" class="note-zoom" data-exam-zoom="${esc(m.id)}" aria-label="${esc(m.caption)} 크게 보기">
+          <img src="${esc(m.file)}" alt="${esc(m.caption)}" loading="lazy" decoding="async">
+        </button>
+        <figcaption><b>${esc(m.caption)}</b><small>${credit(m)}</small></figcaption>
+      </figure>`).join('')}</div>`;
+  }
+
+  function plusParts(p) {
+    if (!p) return { story: '', extra: '' };
+    const story = p.story ? `<div class="note-story"><p class="note-label">📖 흐름 이야기</p><p>${fmt(p.story)}</p></div>` : '';
+    const tips = p.tips && p.tips.length
+      ? `<div class="note-tip"><p class="note-label">💡 시험 포인트·함정</p><ul>${p.tips.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : '';
+    const terms = p.terms && p.terms.length
+      ? `<details class="note-terms"><summary>🔤 용어 풀이 (${p.terms.length})</summary><dl>${p.terms.map(([w, m]) => `<div><dt>${esc(w)}</dt><dd>${esc(m)}</dd></div>`).join('')}</dl></details>` : '';
+    return { story, extra: tips + terms };
+  }
+
   function viewNote(id) {
     const u = unitById[id];
     const i = EXAM_UNITS.indexOf(u);
     const prev = EXAM_UNITS[i - 1];
     const next = EXAM_UNITS[i + 1];
+    const plus = EXAM_PLUS[u.id] || {};
+    const secPlus = plus.sections || {};
+    const tablePlus = plus.tables || {};
+    const sources = plus.sources || [];
+    const toc = u.sections.map((s, k) => [`note-s${k}`, s.h])
+      .concat(u.tables.map((t, k) => [`note-t${k}`, t.title]))
+      .concat(sources.length ? [['note-src', '📜 대표 사료']] : []);
     $app.innerHTML = `
-      <div class="exam" style="--era:${u.color}">
+      <div class="exam ${data().noteCompact ? 'compact' : ''}" style="--era:${u.color}">
         <a class="back" href="#/exam">← 심화 학습 홈</a>
         <header class="exam-unit-head">
           <p>단원 ${i + 1} · 개념 노트</p>
@@ -189,26 +223,72 @@
           <a class="btn btn-ghost" href="#/exam/flash/${u.id}">🗂️ 암기 카드</a>
           ${u.era ? `<a class="btn btn-ghost" href="#/era/${u.era}">🐯 아이용 이야기로 먼저 보기</a>` : ''}
         </div>
-        ${u.sections.map(s => `
-          <section class="panel note">
+        <nav class="note-toc" aria-label="이 단원의 주제">${toc.map(([target, label]) => `<button type="button" data-exam-jump="${target}">${esc(label)}</button>`).join('')}</nav>
+        <label class="flip-opt"><input type="checkbox" data-exam-compact ${data().noteCompact ? 'checked' : ''}> 📌 핵심 정리만 보기 (이야기·사진·포인트·사료 숨기기)</label>
+        ${u.sections.map((s, k) => {
+          const p = secPlus[s.h];
+          const { story, extra } = plusParts(p);
+          return `
+          <section class="panel note" id="note-s${k}">
             <h2>${esc(s.h)}</h2>
-            <ul>${s.items.map(it => `<li>${fmt(it)}</li>`).join('')}</ul>
-          </section>`).join('')}
-        ${u.tables.map(t => `
-          <section class="panel note">
+            ${figures(p && p.img)}
+            ${story}
+            ${story ? '<p class="note-label note-core-label">📌 핵심 정리</p>' : ''}
+            <ul class="note-core">${s.items.map(it => `<li>${fmt(it)}</li>`).join('')}</ul>
+            ${extra}
+          </section>`;
+        }).join('')}
+        ${u.tables.map((t, k) => {
+          const { story, extra } = plusParts(tablePlus[t.title]);
+          return `
+          <section class="panel note" id="note-t${k}">
             <h2>📋 ${esc(t.title)}</h2>
+            ${story}
             <p class="hint table-hint">표를 옆으로 밀면 더 볼 수 있어요 →</p>
             <div class="table-wrap"><table class="ntable">
               <thead><tr>${t.head.map(h => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead>
-              <tbody>${t.rows.map(r => `<tr>${r.map((c, k) => k === 0 ? `<th scope="row">${fmt(c)}</th>` : `<td>${fmt(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+              <tbody>${t.rows.map(r => `<tr>${r.map((c, n) => n === 0 ? `<th scope="row">${fmt(c)}</th>` : `<td>${fmt(c)}</td>`).join('')}</tr>`).join('')}</tbody>
             </table></div>
-          </section>`).join('')}
+            ${extra}
+          </section>`;
+        }).join('')}
+        ${sources.length ? `
+          <section class="panel note note-sources" id="note-src">
+            <h2>📜 대표 사료 읽기</h2>
+            <p class="hint">사료를 읽고 어느 시대·누구·어떤 사건인지 먼저 떠올린 뒤, 정답과 단서를 펼쳐 확인하세요.</p>
+            ${sources.map((src, n) => `
+              <article class="source">
+                <h3>사료 ${n + 1}</h3>
+                <div class="exam-src">${fmtSrc(src.text)}<p class="src-from">— ${esc(src.from)}</p></div>
+                <details class="source-ans">
+                  <summary>정답과 단서 보기</summary>
+                  <p><b>정답:</b> ${esc(src.answer)}</p>
+                  <p><b>🔎 단서:</b> ${esc(src.clue)}</p>
+                  <p class="hint">자료: ${esc(src.title)}</p>
+                </details>
+              </article>`).join('')}
+          </section>` : ''}
+        ${figuresCreditNote(u)}
         <div class="cta-row">
           ${prev ? `<a class="btn btn-ghost" href="#/exam/note/${prev.id}">◀ ${esc(prev.short)}</a>` : ''}
           <a class="btn btn-blue" href="#/exam/drill/${u.id}">✏️ 문제 풀기</a>
           ${next ? `<a class="btn btn-ghost" href="#/exam/note/${next.id}">${esc(next.short)} ▶</a>` : ''}
         </div>
       </div>`;
+  }
+
+  // 사진이 있는 단원에는 사진 출처 안내를 덧붙여요
+  function figuresCreditNote(u) {
+    const plus = EXAM_PLUS[u.id];
+    if (!plus) return '';
+    const used = Object.values(plus.sections || {}).flatMap(p => p.img || []).filter(id => imgById[id]);
+    return used.length ? '<p class="hint note-credit">사진은 위키미디어 공용(Wikimedia Commons)에서 자유 이용이 허락된 것만 골라 실었어요. 각 사진 아래에 지은이와 라이선스를 적었어요.</p>' : '';
+  }
+
+  function zoomImage(id) {
+    const m = imgById[id];
+    if (!m) return;
+    A.openModal(`<figure class="zoom-fig"><img src="${esc(m.file)}" alt="${esc(m.caption)}"><figcaption><b>${esc(m.caption)}</b><small>${credit(m)}</small></figcaption></figure>`, m.caption);
   }
 
   // ---------- 문제 풀기 (단원 · 섞어 풀기 · 오답 노트) ----------
@@ -639,9 +719,23 @@
   // ---------- 이벤트 ----------
   document.addEventListener('change', e => {
     if (e.target.matches('[data-exam-rev]')) { data().flashRev = e.target.checked; A.save(); }
+    if (e.target.matches('[data-exam-compact]')) {
+      data().noteCompact = e.target.checked;
+      A.save();
+      const box = e.target.closest('.exam');
+      if (box) box.classList.toggle('compact', e.target.checked);
+    }
   });
 
   document.addEventListener('click', e => {
+    const jump = e.target.closest('[data-exam-jump]');
+    if (jump) {
+      const target = document.getElementById(jump.dataset.examJump);
+      if (target) target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      return;
+    }
+    const zoom = e.target.closest('[data-exam-zoom]');
+    if (zoom) { zoomImage(zoom.dataset.examZoom); return; }
     const pick = e.target.closest('[data-exam-pick]');
     if (pick && !pick.disabled && !pick.closest('details')) {
       const k = Number(pick.dataset.examPick);
