@@ -9,7 +9,12 @@ NATION_IMAGES.push(
   { id: 'japan-tongsinsa', file: 'img/nations/japan-tongsinsa.jpg', caption: '에도(지금의 도쿄)에 들어가는 조선 통신사 행렬 (하네가와 도에이, 1748년)', author: 'Hanegawa Tōei', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Joseon_procession_in_Edo_1748.jpg' },
   { id: 'mongolia-genghis', file: 'img/nations/mongolia-genghis.jpg', caption: '칭기즈 칸의 초상 (원나라 궁정 화가, 타이베이 국립 고궁 박물원)', author: '원나라 궁정 화가 (작자 미상)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Genghis_Khan.jpg' },
   { id: 'mongolia-kublai', file: 'img/nations/mongolia-kublai.jpg', caption: '쿠빌라이 칸의 초상 (원나라 궁정 화가, 타이베이 국립 고궁 박물원)', author: '원나라 궁정 화가 (네팔 출신 아니게의 그림으로 전해짐)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Kublai_Khan_square.jpg' },
-  /*IMAGES*/
+  { id: 'japan-horyuji', file: 'img/nations/japan-horyuji.jpg', caption: '호류지의 금당과 오층탑 (일본 나라현)', author: '663highland', license: 'CC BY-SA 4.0', license_url: 'https://creativecommons.org/licenses/by-sa/4.0', source: 'https://commons.wikimedia.org/wiki/File:Horyu-ji11s3200.jpg' },
+  { id: 'japan-perry', file: 'img/nations/japan-perry.jpg', caption: '1854년 요코하마에 상륙하는 페리 제독 일행 (빌헬름 하이네 그림의 석판화)', author: 'Wilhelm Heine (그림)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Commodore-Perry-Visit-Kanagawa-1854.jpg' },
+  { id: 'japan-mongol', file: 'img/nations/japan-mongol.jpg', caption: '『몽고습래회사』 — 몽골군과 싸우는 무사 다케자키 스에나가 (13세기 말, 일본 궁내청 소장)', author: '작자 미상 (다케자키 스에나가가 그리게 함)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:M%C5%8Dko_Sh%C5%ABrai_Ekotoba.jpg' },
+  { id: 'mongolia-paiza', file: 'img/nations/mongolia-paiza.jpg', caption: '파스파 문자가 새겨진 원나라의 패자(통행증) (13세기, 미국 메트로폴리탄 미술관)', author: '작자 미상 (원나라)', license: 'CC0 (퍼블릭 도메인)', license_url: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:%E5%85%AB%E6%80%9D%E5%B7%B4%E6%96%87%E9%90%A1%E7%89%8C-Safe_Conduct_Pass_(Paiza)_with_Inscription_in_Phakpa_Script_MET_DT7051.jpg' },
+  { id: 'mongolia-naadam', file: 'img/nations/mongolia-naadam.jpg', caption: '나담 축제의 몽골 씨름 (2023년, 몽골 울란바토르)', author: 'Bernard Gagnon', license: 'CC0 (퍼블릭 도메인)', license_url: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:Naadam_2023,_Ulan_Bator_08.jpg' },
+  { id: 'china-giraffe', file: 'img/nations/china-giraffe.jpg', caption: '〈조공 기린과 시종〉 — 1414년 벵골 사신이 명나라에 바친 기린 (선도의 그림을 바탕으로 한 명나라 그림, 미국 필라델피아 미술관)', author: '선도(沈度) 원작 · 명나라 화가', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Tribute_Giraffe_with_Attendant_cropped.jpg' },
 );
 
 NATIONS.push(

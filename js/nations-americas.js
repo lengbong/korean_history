@@ -12,6 +12,10 @@ NATION_IMAGES.push(
   { id: 'peru-quipu', file: 'img/nations/peru-quipu.jpg', caption: '잉카의 매듭 기록 키푸 (페루 리마, 라르코 박물관)', author: 'Lyndsaruell (영어 위키백과), Claus Ableiter 옮김', license: 'CC BY-SA 3.0', license_url: 'http://creativecommons.org/licenses/by-sa/3.0/', source: 'https://commons.wikimedia.org/wiki/File:Inca_Quipu.jpg' },
   { id: 'peru-machupicchu', file: 'img/nations/peru-machupicchu.jpg', caption: '마추픽추와 뒤편의 와이나픽추 봉우리 (페루 쿠스코주)', author: 'Pedro Szekely at https://www.flickr.com/photos/pedrosz/', license: 'CC BY-SA 2.0', license_url: 'https://creativecommons.org/licenses/by-sa/2.0', source: 'https://commons.wikimedia.org/wiki/File:Machu_Picchu,_Peru.jpg' },
   // __IMAGES__
+  { id: 'mexico-chichenitza', file: 'img/nations/mexico-chichenitza.jpg', caption: '치첸이트사의 엘 카스티요(쿠쿨칸 신전) (멕시코 유카탄)', author: 'Daniel Schwen', license: 'CC BY-SA 4.0', license_url: 'https://creativecommons.org/licenses/by-sa/4.0', source: 'https://commons.wikimedia.org/wiki/File:Chichen_Itza_3.jpg' },
+  { id: 'mexico-tlaxcala', file: 'img/nations/mexico-tlaxcala.jpg', caption: '〈틀락스칼라의 천(리엔소 데 틀락스칼라)〉 속 코르테스와 통역사 말린체 (16세기 그림을 옮겨 그린 것)', author: '작자 미상 (틀락스칼라 화가)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Malinche_Tlaxcala.jpg' },
+  { id: 'mexico-dolores', file: 'img/nations/mexico-dolores.jpg', caption: '‘이달고 신부 만세!’라고 적힌 미겔 이달고의 초상 인쇄물 (호세 과달루페 포사다 펴냄)', author: 'José Guadalupe Posada (1852~1913)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Miguel_Hidalgo_y_Costilla.jpg' },
+  { id: 'peru-ransom', file: 'img/nations/peru-ransom.jpg', caption: '카하마르카의 ‘몸값의 방’ (페루)', author: 'Miguel Francisco Rueda Ñañez', license: 'CC BY-SA 4.0', license_url: 'https://creativecommons.org/licenses/by-sa/4.0', source: 'https://commons.wikimedia.org/wiki/File:El_cuarto_del_Rescate,_Cajamarca,_Peru.jpg' },
 );
 
 NATIONS.push(
