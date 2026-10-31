@@ -43,10 +43,18 @@ python3 -m http.server 8000
 # 브라우저에서 http://localhost:8000 접속
 ```
 
-### GitHub Pages로 공개하기
-1. GitHub 저장소의 **Settings → Pages**로 이동해요.
-2. **Source**에서 `Deploy from a branch`를 고르고, 배포할 브랜치와 `/ (root)` 폴더를 선택해 저장해요.
-3. 잠시 뒤 `https://<사용자이름>.github.io/korean_history/` 주소로 접속할 수 있어요.
+### 휴대폰에서 바로 열기 (GitHub Pages, 무료)
+GitHub Pages는 무료 계정에서 **공개 저장소**만 지원해요.
+
+1. 저장소 **Settings → General** 맨 아래 **Danger Zone → Change repository visibility → Make public**
+2. **Settings → Pages**에서 **Source**를 `Deploy from a branch`로 두고, 배포할 브랜치와 `/ (root)` 폴더를 골라 **Save**
+3. 1~2분 뒤 `https://<사용자이름>.github.io/korean_history/` 주소로 접속해요. 이후에는 브랜치에 올린 내용이 자동으로 반영돼요.
+
+**홈 화면에 앱처럼 추가하기**
+- 아이폰(사파리): 사이트를 열고 아래쪽 **공유 버튼(네모에 위쪽 화살표)** → **홈 화면에 추가**
+- 안드로이드(크롬): 사이트를 열고 오른쪽 위 **⋮** → **홈 화면에 추가**(또는 **앱 설치**)
+
+범이 얼굴 아이콘과 ‘역사 탐험대’라는 이름으로 홈 화면에 나타나고, 주소창 없이 앱처럼 열려요.
 
 ## 파일 구성
 
@@ -57,6 +65,9 @@ js/data.js      한국사: 시대 이야기, 퀴즈 문제, 카드, 순서 맞�
 js/world.js     세계사: 위와 같은 구조의 데이터
 js/art.js       문화유산 카드 그림(SVG): 고인돌, 첨성대, 다보탑, 태극기, 피라미드, 만리장성, 마야 피라미드 등
 js/app.js       화면 이동, 대원 관리, 퀴즈·카드·순서 맞추기 로직
+manifest.webmanifest  홈 화면에 추가할 때 쓰는 앱 이름·아이콘 정보
+icons/          앱 아이콘(범이 얼굴) — icon.svg 원본과 PNG 크기별 파일
+.nojekyll       GitHub Pages가 파일을 그대로 올리도록 하는 표시 파일
 js/exam.js      한능검 심화: 시험 정보(문항 수·시간·급수·단원별 출제 비율)
 js/exam-notes.js  한능검 심화: 단원별 개념 노트와 정리 표
 js/exam-q1.js   한능검 심화: 연습 문제 ① (선사 ~ 조선 전기)
