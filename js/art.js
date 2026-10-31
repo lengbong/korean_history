@@ -46,6 +46,12 @@ const ART = (() => {
   const trigram = (dist, lines) => lines.map((broken, i) => bar(-(dist - 5 + i * 5) - 1.67, broken)).join('');
   const D = 36.67;
 
+  // 마야 피라미드의 계단식 단 (아래가 넓고 위로 갈수록 좁아져요)
+  const mayaTiers = range(5).map(i => {
+    const w = 100 - 16 * i;
+    return `<rect x="${60 - w / 2}" y="${88 - 12 * i}" width="${w}" height="12"/>`;
+  }).join('');
+
   // 피라미드의 돌 단 (꼭짓점 52,30 · 밑변 10~94, y=99)
   const pyramidCourses = range(6).map(i => {
     const y = 40 + i * 10;
@@ -230,5 +236,36 @@ const ART = (() => {
         <line x1="54" y1="80" x2="54" y2="106"/><line x1="60" y1="76" x2="60" y2="106"/><line x1="66" y1="80" x2="66" y2="106"/>
         <line x1="48" y1="92" x2="72" y2="92"/><line x1="48" y1="99" x2="72" y2="99"/>
       </g>`),
+
+    olmec: svg(`
+      <ellipse cx="60" cy="112" rx="36" ry="5" fill="#000" opacity=".08"/>
+      <circle cx="24" cy="78" r="7" fill="#a39d8c" stroke="#55503f" stroke-width="2.5"/>
+      <circle cx="96" cy="78" r="7" fill="#a39d8c" stroke="#55503f" stroke-width="2.5"/>
+      <path d="M27 56 C27 30 93 30 93 56 V92 C93 104 82 111 60 111 C38 111 27 104 27 92Z" fill="#938d7e" stroke="#55503f" stroke-width="3"/>
+      <path d="M21 60 C18 20 102 20 99 60 C80 51 40 51 21 60Z" fill="#a8a291" stroke="#55503f" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M26 48 C44 40 76 40 94 48" fill="none" stroke="#55503f" stroke-width="2"/>
+      <path d="M36 66 Q46 61 55 66 M65 66 Q74 61 84 66" fill="none" stroke="#55503f" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="46" cy="72" rx="7" ry="3" fill="#55503f"/>
+      <ellipse cx="74" cy="72" rx="7" ry="3" fill="#55503f"/>
+      <path d="M56 70 L50 88 Q60 95 70 88 L64 70" fill="#9c9686" stroke="#55503f" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M45 99 Q60 92 75 99 Q60 107 45 99Z" fill="#7d7769" stroke="#55503f" stroke-width="2.5" stroke-linejoin="round"/>`),
+
+    mayapyramid: svg(`
+      <circle cx="18" cy="96" r="12" fill="#558b2f"/><circle cx="104" cy="94" r="13" fill="#558b2f"/>
+      <rect x="0" y="100" width="120" height="14" fill="#7cb342"/>
+      <g fill="#cdb88f" stroke="#7d6a4f" stroke-width="2">${mayaTiers}</g>
+      <path d="M52 100 L54 40 H66 L68 100Z" fill="#b6a077" stroke="#7d6a4f" stroke-width="2" stroke-linejoin="round"/>
+      <g stroke="#7d6a4f" stroke-width="1.2" opacity=".7">${range(10).map(i => `<line x1="${53.5 - i * 0.2}" y1="${46 + i * 6}" x2="${66.5 + i * 0.2}" y2="${46 + i * 6}"/>`).join('')}</g>
+      <rect x="45" y="22" width="30" height="18" fill="#cdb88f" stroke="#7d6a4f" stroke-width="2.5"/>
+      <rect x="50" y="14" width="20" height="8" fill="#bfa97f" stroke="#7d6a4f" stroke-width="2"/>
+      <rect x="56" y="29" width="8" height="11" fill="#5d4037"/>`),
+
+    aksum: svg(`
+      <rect x="28" y="104" width="64" height="9" rx="2" fill="#a1887f"/>
+      <path d="M43 104 V24 Q60 6 77 24 V104Z" fill="#bcae9f" stroke="#6d5f53" stroke-width="3" stroke-linejoin="round"/>
+      <g stroke="#6d5f53" stroke-width="1.5">${range(6).map(i => `<line x1="43" y1="${33 + i * 11}" x2="77" y2="${33 + i * 11}"/>`).join('')}</g>
+      <g fill="#6d5f53">${range(5).map(i => `<rect x="49" y="${36 + i * 11}" width="8" height="6" rx="1"/><rect x="63" y="${36 + i * 11}" width="8" height="6" rx="1"/>`).join('')}</g>
+      <rect x="54" y="91" width="12" height="13" fill="#6d5f53"/>
+      <path d="M50 18 Q60 11 70 18" fill="none" stroke="#fff" stroke-width="2" opacity=".5" stroke-linecap="round"/>`),
   };
 })();

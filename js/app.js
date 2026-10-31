@@ -1,11 +1,12 @@
 /*
- * 범이의 한국사 탐험대 — 화면과 놀이 로직
+ * 범이의 역사 탐험대 — 화면과 놀이 로직
  * 주소(#/...)에 따라 화면을 그리는 단일 페이지 앱입니다.
  * 한국사(js/data.js)와 세계사(js/world.js) 데이터를 함께 사용해요.
  */
 (() => {
   'use strict';
 
+  // 이름이 바뀌어도 기존 기록이 이어지도록 저장 키는 그대로 둬요
   const STORE_KEY = 'beomi-korean-history-v1';
   const AVATARS = ['🐯', '🐰', '🐻', '🦊', '🐼', '🐸', '🐧', '🦁', '🐶', '🐱', '🐹', '🐨'];
   const LEVELS = {
@@ -754,7 +755,7 @@
   function separable(a, b, minGap) {
     const gap = Math.abs(a.year - b.year);
     if (gap < minGap) return false;
-    return isApprox(a) || isApprox(b) ? gap >= 50 : gap > 0;
+    return isApprox(a) || isApprox(b) ? gap >= 100 : gap > 0;
   }
   function pickSeparated(pool, n, minGap) {
     const picks = [];
@@ -884,7 +885,7 @@
     const canAdd = state.players.length < MAX_PLAYERS;
     $app.innerHTML = `
       <header class="page-head">
-        <h1>${first ? '🐯 한국사 탐험대에 온 걸 환영해!' : '👨‍👩‍👧 탐험 대원'}</h1>
+        <h1>${first ? '🐯 역사 탐험대에 온 걸 환영해!' : '👨‍👩‍👧 탐험 대원'}</h1>
         <p>${first ? '먼저 탐험 대원으로 등록해 줘. 가족 모두 각자 등록할 수 있어요!' : '누가 탐험할 차례인가요? 대원을 눌러 바꿀 수 있어요.'}</p>
       </header>
       ${state.players.length ? `<ul class="players">${state.players.map(p => {
