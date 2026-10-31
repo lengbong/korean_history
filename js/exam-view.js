@@ -1,7 +1,8 @@
 /*
  * 범이의 역사 탐험대 — 한국사능력검정시험 심화 대비 화면
  * 주소: #/exam (학습 홈), #/exam/note/<단원>, #/exam/drill/<단원|mix|wrong>, #/exam/mock, #/exam/result,
- *       #/exam/flash (암기 카드 덱 고르기), #/exam/flash/<단원|all|hard>
+ *       #/exam/flash (암기 카드 덱 고르기), #/exam/flash/<단원|all|hard>,
+ *       #/exam/dict (역사 사전), #/exam/dict/u.<단원> (단원만 보기), #/exam/drill/t.<낱말> (낱말 관련 문제)
  * 기록은 대원별로 player.exam 에 저장합니다.
  */
 (() => {
@@ -110,7 +111,8 @@
     stopTimer();
     const [, sub, arg] = location.hash.replace(/^#\/?/, '').split('/');
     if (sub === 'note' && unitById[arg]) viewNote(arg);
-    else if (sub === 'drill' && (unitById[arg] || arg === 'mix' || arg === 'wrong')) viewDrill(arg);
+    else if (sub === 'drill' && (unitById[arg] || arg === 'mix' || arg === 'wrong' || (arg && arg.startsWith('t.') && termQs(fromKey(arg)).length))) viewDrill(arg);
+    else if (sub === 'dict' && EXAM_DICT.length) viewDict(arg);
     else if (sub === 'mock') viewMock();
     else if (sub === 'result' && data().last) viewResult();
     else if (sub === 'flash' && !arg) viewFlashHub();
@@ -148,6 +150,7 @@
           <a class="exam-big wrongnote" href="#/exam/drill/wrong"><span>❗ 오답 노트</span><small>${wrongN ? `${wrongN}문제 · 두 번 연속 맞히면 빠져요` : '틀린 문제가 자동으로 모여요'}</small></a>
           <a class="exam-big mix" href="#/exam/drill/mix"><span>🎲 전 단원 섞어 풀기</span><small>${MIX_LEN}문제 · 정답과 해설을 바로 확인</small></a>
           <a class="exam-big flash" href="#/exam/flash"><span>🗂️ 빈출 연도·키워드 암기 카드</span><small>${FLASH.length}장 · 헷갈리는 카드 ${hardCount()}장</small></a>
+          ${EXAM_DICT.length ? `<a class="exam-big dict" href="#/exam/dict"><span>📖 역사 사전</span><small>핵심 낱말 ${EXAM_DICT.length}개 · 자세한 설명과 이야기, 시험 포인트</small></a>` : ''}
         </div>
         <h2 class="exam-h2">단원별 학습</h2>
         <ol class="unit-list">
@@ -189,13 +192,13 @@
       </figure>`).join('')}</div>`;
   }
 
-  function plusParts(p) {
+  function plusParts(p, unit) {
     if (!p) return { story: '', extra: '' };
-    const story = p.story ? `<div class="note-story"><p class="note-label">📖 흐름 이야기</p><p>${fmt(p.story)}</p></div>` : '';
+    const story = p.story ? `<div class="note-story"><p class="note-label">📖 흐름 이야기</p><p>${fmtTerms(p.story, unit)}</p></div>` : '';
     const tips = p.tips && p.tips.length
-      ? `<div class="note-tip"><p class="note-label">💡 시험 포인트·함정</p><ul>${p.tips.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : '';
+      ? `<div class="note-tip"><p class="note-label">💡 시험 포인트·함정</p><ul>${p.tips.map(t => `<li>${fmtTerms(t, unit)}</li>`).join('')}</ul></div>` : '';
     const terms = p.terms && p.terms.length
-      ? `<details class="note-terms"><summary>🔤 용어 풀이 (${p.terms.length})</summary><dl>${p.terms.map(([w, m]) => `<div><dt>${esc(w)}</dt><dd>${esc(m)}</dd></div>`).join('')}</dl></details>` : '';
+      ? `<details class="note-terms"><summary>🔤 용어 풀이 (${p.terms.length})</summary><dl>${p.terms.map(([w, m]) => `<div><dt>${findEntry(w, unit) ? termBtn(w, unit) : esc(w)}</dt><dd>${esc(m)}</dd></div>`).join('')}</dl></details>` : '';
     return { story, extra: tips + terms };
   }
 
@@ -225,21 +228,22 @@
         </div>
         <nav class="note-toc" aria-label="이 단원의 주제">${toc.map(([target, label]) => `<button type="button" data-exam-jump="${target}">${esc(label)}</button>`).join('')}</nav>
         <label class="flip-opt"><input type="checkbox" data-exam-compact ${data().noteCompact ? 'checked' : ''}> 📌 핵심 정리만 보기 (이야기·사진·포인트·사료 숨기기)</label>
+        <p class="term-help"><span class="term-sample" aria-hidden="true">밑줄 친 낱말</span>을 누르면 자세한 설명과 이야기가 열려요.${EXAM_DICT.some(e => e.unit === u.id) ? ` <a href="#/exam/dict/u.${u.id}">📖 이 단원 사전 보기</a>` : ''}</p>
         ${u.sections.map((s, k) => {
           const p = secPlus[s.h];
-          const { story, extra } = plusParts(p);
+          const { story, extra } = plusParts(p, u.id);
           return `
           <section class="panel note" id="note-s${k}">
             <h2>${esc(s.h)}</h2>
             ${figures(p && p.img)}
             ${story}
             ${story ? '<p class="note-label note-core-label">📌 핵심 정리</p>' : ''}
-            <ul class="note-core">${s.items.map(it => `<li>${fmt(it)}</li>`).join('')}</ul>
+            <ul class="note-core">${s.items.map(it => `<li>${fmtTerms(it, u.id)}</li>`).join('')}</ul>
             ${extra}
           </section>`;
         }).join('')}
         ${u.tables.map((t, k) => {
-          const { story, extra } = plusParts(tablePlus[t.title]);
+          const { story, extra } = plusParts(tablePlus[t.title], u.id);
           return `
           <section class="panel note" id="note-t${k}">
             <h2>📋 ${esc(t.title)}</h2>
@@ -247,7 +251,7 @@
             <p class="hint table-hint">표를 옆으로 밀면 더 볼 수 있어요 →</p>
             <div class="table-wrap"><table class="ntable">
               <thead><tr>${t.head.map(h => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead>
-              <tbody>${t.rows.map(r => `<tr>${r.map((c, n) => n === 0 ? `<th scope="row">${fmt(c)}</th>` : `<td>${fmt(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+              <tbody>${t.rows.map(r => `<tr>${r.map((c, n) => n === 0 ? `<th scope="row">${fmtTerms(c, u.id)}</th>` : `<td>${fmtTerms(c, u.id)}</td>`).join('')}</tr>`).join('')}</tbody>
             </table></div>
             ${extra}
           </section>`;
@@ -291,6 +295,262 @@
     A.openModal(`<figure class="zoom-fig"><img src="${esc(m.file)}" alt="${esc(m.caption)}"><figcaption><b>${esc(m.caption)}</b><small>${credit(m)}</small></figcaption></figure>`, m.caption);
   }
 
+  // ---------- 역사 사전 (개념 노트의 굵은 낱말 → 자세한 설명 팝업) ----------
+  // 낱말 비교: 띄어쓰기·『』·괄호 속 덧붙임 ‘(12월)’은 무시해요
+  const squash = s => String(s).replace(/[『』「」《》〈〉\s]/g, '');
+  const normKey = s => squash(String(s).replace(/\([^)]*\)/g, '')).trim();
+  const dictById = Object.fromEntries(EXAM_DICT.map(e => [e.id, e]));
+  const dictIndex = new Map();
+  EXAM_DICT.forEach(e => [e.term, e.id, ...(e.aliases || [])].forEach(t => {
+    const k = normKey(t);
+    if (!k) return;
+    const list = dictIndex.get(k) || [];
+    if (!list.includes(e)) list.push(e);
+    dictIndex.set(k, list);
+  }));
+  // 같은 이름이 여러 단원에 있으면 지금 보고 있는 단원의 항목을 먼저 골라요
+  function findEntry(text, unit) {
+    const list = dictIndex.get(normKey(text));
+    return list ? list.find(e => e.unit === unit) || list[0] : null;
+  }
+  // 용어 풀이(js/exam-plus*.js의 terms)
+  const glossIndex = new Map();
+  Object.entries(EXAM_PLUS).forEach(([unit, p]) => Object.values(p.sections || {}).concat(Object.values(p.tables || {}))
+    .forEach(x => (x.terms || []).forEach(([w, m]) => { const k = normKey(w); if (!glossIndex.has(k)) glossIndex.set(k, { w, m, unit }); })));
+  // 사전 사진: 항목의 img + 사진 쪽에서 dict: [낱말]로 이어 준 것
+  const dictImgs = new Map();
+  EXAM_IMAGES.forEach(m => (m.dict || []).forEach(t => { const k = normKey(t); dictImgs.set(k, (dictImgs.get(k) || []).concat(m.id)); }));
+  const imgsFor = e => [...new Set([...(e.img || []), ...(dictImgs.get(normKey(e.id)) || []), ...(dictImgs.get(normKey(e.term)) || [])])].filter(id => imgById[id]);
+
+  // 관련 문제·암기 카드 찾기 (띄어쓰기를 지운 글자로 비교)
+  const qHay = EXAM_QUESTIONS.map(q => [q, squash([q.q, q.src || '', ...q.o.flat()].join(' '))]);
+  const flashHay = FLASH.map(c => [c, squash(c.f + ' ' + c.b)]);
+  const needlesOf = s => {
+    const e = dictById[s];
+    return [...new Set((e ? [e.term, e.id, ...(e.aliases || [])] : [s]).map(normKey))].filter(n => n.length >= 2);
+  };
+  const qsCache = new Map();
+  function termQs(s) {
+    if (!qsCache.has(s)) {
+      const ns = needlesOf(s);
+      qsCache.set(s, ns.length ? qHay.filter(([, h]) => ns.some(n => h.includes(n))).map(([q]) => q) : []);
+    }
+    return qsCache.get(s);
+  }
+  function termFlash(s) {
+    const ns = needlesOf(s);
+    return ns.length ? flashHay.filter(([, h]) => ns.some(n => h.includes(n))).map(([c]) => c) : [];
+  }
+  const toKey = s => 't.' + encodeURIComponent(s);
+  function fromKey(key) {
+    const raw = key.slice(2);
+    try { return decodeURIComponent(raw); } catch (err) { return raw; }
+  }
+  const termTitle = s => (dictById[s] ? dictById[s].term : s);
+
+  // 누를 수 있는 낱말인지: 사전 항목이 있으면 'full', 용어 풀이·암기 카드·관련 문제가 있으면 'auto'
+  const STOP = new Set(['가운데', '벽 쪽', '왕', '이후', '특사', '판', '놀이와 음식', '다른 지역의 사건'].map(normKey));
+  const linkCache = new Map();
+  function linkState(text, unit) {
+    const ck = unit + '|' + text;
+    if (linkCache.has(ck)) return linkCache.get(ck);
+    const k = normKey(text);
+    let st = null;
+    if (findEntry(text, unit)) st = 'full';
+    else if (k.length >= 2 && !STOP.has(k) && !/^[\d·~,.]+/.test(k) && !/[→]/.test(text)) {
+      const n = termQs(text).length;
+      if (glossIndex.has(k) || termFlash(text).length || (n >= 1 && n <= 40)) st = 'auto';
+    }
+    linkCache.set(ck, st);
+    return st;
+  }
+  const termBtn = (text, unit) =>
+    `<button type="button" class="term ${linkState(text, unit) === 'full' ? 'full' : ''}" data-term="${esc(text)}" data-term-unit="${esc(unit)}">${esc(text)}</button>`;
+  function boldTerm(t, unit, self) {
+    const ok = x => !(self && self.has(normKey(x))) && linkState(x.trim(), unit);
+    if (ok(t)) return termBtn(t, unit);
+    if (t.includes('·') && t.split('·').some(ok)) return `<b>${t.split('·').map(x => (ok(x) ? termBtn(x.trim(), unit) : esc(x))).join('·')}</b>`;
+    return `<b>${esc(t)}</b>`;
+  }
+  // **굵게**를 누를 수 있는 낱말로 바꿔요 (self: 지금 열린 항목 자신은 빼요)
+  const fmtTerms = (s, unit, self) => String(s).split(/\*\*(.+?)\*\*/).map((part, i) => (i % 2 ? boldTerm(part, unit, self) : esc(part))).join('');
+
+  // ----- 팝업 -----
+  let dictCur = null;
+  const dictStack = [];
+
+  function showDictModal(html, label) {
+    const box = document.querySelector('#modal .modal-box.dict-box');
+    if (box) {
+      box.innerHTML = `<button class="modal-x" type="button" data-close aria-label="닫기">✕</button>${html}`;
+      box.setAttribute('aria-label', label);
+      box.scrollTop = 0;
+      box.focus();
+    } else {
+      A.openModal(html, label);
+      const b = document.querySelector('#modal .modal-box');
+      if (b) b.classList.add('dict-box');
+    }
+  }
+
+  function openTerm(text, unit, { id = null, fromModal = false } = {}) {
+    const e = id ? dictById[id] : findEntry(text, unit);
+    if (fromModal && dictCur) dictStack.push(dictCur);
+    else dictStack.length = 0;
+    dictCur = { text: e ? e.term : text, unit: e ? e.unit : unit, id: e ? e.id : null };
+    showDictModal(e ? entryHtml(e) : autoHtml(text, unit), e ? e.term : text);
+  }
+
+  function dictBack() {
+    const prev = dictStack.pop();
+    if (!prev) return;
+    dictCur = prev;
+    const e = prev.id && dictById[prev.id];
+    showDictModal(e ? entryHtml(e) : autoHtml(prev.text, prev.unit), prev.text);
+  }
+
+  function backBtn() {
+    const prev = dictStack[dictStack.length - 1];
+    return prev ? `<button type="button" class="dict-back" data-dict-back>◀ ‘${esc(prev.text)}’(으)로 돌아가기</button>` : '';
+  }
+
+  function dictActions(key, unit, qn) {
+    const here = location.hash;
+    return `<div class="cta-row dict-actions">
+      ${qn ? `<a class="btn btn-blue" href="#/exam/drill/${toKey(key)}">✏️ 관련 문제 ${qn}개 풀기</a>` : ''}
+      ${unitById[unit] && !here.startsWith(`#/exam/note/${unit}`) ? `<a class="btn btn-ghost" href="#/exam/note/${unit}">📘 ${esc(unitById[unit].short)} 개념 노트</a>` : ''}
+      ${EXAM_DICT.length && !here.startsWith('#/exam/dict') ? '<a class="btn btn-ghost" href="#/exam/dict">📖 역사 사전</a>' : ''}
+    </div>`;
+  }
+
+  function flashBlock(cards) {
+    if (!cards.length) return '';
+    return `<section class="dict-sec"><p class="note-label">🗂️ 암기 카드로 확인</p>
+      <ul class="dict-flash">${cards.slice(0, 3).map(c => `<li><b>${esc(c.f)}</b><span>${esc(c.b)}</span></li>`).join('')}</ul></section>`;
+  }
+
+  function entryHtml(e) {
+    const u = unitById[e.unit] || {};
+    const self = new Set([e.term, e.id, ...(e.aliases || [])].map(normKey));
+    const imgs = imgsFor(e).slice(0, 2).map(id => imgById[id]);
+    const rel = (e.related || []).filter(r => !self.has(normKey(r)));
+    return `
+      <article class="dict-pop" style="--era:${u.color || 'var(--blue)'}">
+        ${backBtn()}
+        <p class="dict-meta"><span class="chip">${esc(e.kind)}</span><span class="chip">${esc(u.short || '')}</span><span class="dict-when">${esc(e.when)}</span></p>
+        <h2 class="dict-title">${esc(e.term)}</h2>
+        <p class="dict-sum">${fmt(e.summary)}</p>
+        ${imgs.map(m => `
+          <figure class="dict-fig">
+            <img src="${esc(m.file)}" alt="${esc(m.caption)}" loading="lazy" decoding="async">
+            <figcaption><b>${esc(m.caption)}</b><small>${credit(m)}</small></figcaption>
+          </figure>`).join('')}
+        <section class="dict-sec note-story"><p class="note-label">📖 자세한 이야기</p><p>${fmtTerms(e.story, e.unit, self)}</p></section>
+        ${e.points && e.points.length ? `<section class="dict-sec note-tip"><p class="note-label">💡 시험 포인트·함정</p><ul>${e.points.map(t => `<li>${fmtTerms(t, e.unit, self)}</li>`).join('')}</ul></section>` : ''}
+        ${rel.length ? `<section class="dict-sec"><p class="note-label">🔗 함께 보면 좋은 낱말</p><div class="dict-rel">${rel.map(r => (linkState(r, e.unit)
+          ? `<button type="button" class="chip dict-chip" data-term="${esc(r)}" data-term-unit="${esc(e.unit)}">${esc(r)}</button>`
+          : `<span class="chip dict-chip plain">${esc(r)}</span>`)).join('')}</div></section>` : ''}
+        ${flashBlock(termFlash(e.id))}
+        ${dictActions(e.id, e.unit, termQs(e.id).length)}
+      </article>`;
+  }
+
+  // 사전 항목이 없는 낱말: 용어 풀이·노트 문장·암기 카드·관련 문제를 모아 보여 줘요
+  function autoHtml(text, unit) {
+    const u = unitById[unit] || {};
+    const k = normKey(text);
+    const gloss = glossIndex.get(k);
+    const self = new Set([k]);
+    const lines = [];
+    const order = [unit, ...EXAM_UNITS.map(x => x.id).filter(id => id !== unit)];
+    for (const uid of order) {
+      const un = unitById[uid];
+      un.sections.forEach(s => s.items.forEach(it => { if (squash(it).includes(k)) lines.push([uid, it]); }));
+      un.tables.forEach(t => t.rows.forEach(r => { const line = r.join(' — '); if (squash(line).includes(k)) lines.push([uid, line]); }));
+      if (lines.length >= 3) break;
+    }
+    const qn = termQs(text).length;
+    return `
+      <article class="dict-pop auto" style="--era:${u.color || 'var(--blue)'}">
+        ${backBtn()}
+        <p class="dict-meta"><span class="chip">${esc(u.short || '')}</span><span class="dict-when">간단 풀이</span></p>
+        <h2 class="dict-title">${esc(text)}</h2>
+        ${gloss ? `<p class="dict-sum">${esc(gloss.m)}</p>` : ''}
+        ${lines.length ? `<section class="dict-sec"><p class="note-label">📌 개념 노트에서</p><ul class="dict-lines">${lines.slice(0, 3).map(([uid, l]) => `<li>${fmtTerms(l, uid, self)}</li>`).join('')}</ul></section>` : ''}
+        ${flashBlock(termFlash(text))}
+        <p class="hint dict-auto-note">이 낱말은 노트·암기 카드·문제에서 모은 간단 풀이예요.</p>
+        ${dictActions(text, unit, qn)}
+      </article>`;
+  }
+
+  // ----- 사전 목록 화면 -----
+  const dictFilter = { unit: '', q: '' };
+  // 찾기: 낱말·다른 이름을 먼저, 그다음 요약·이야기·관련 낱말까지 살펴요
+  const searchKey = e => squash([e.term, e.id, ...(e.aliases || []), e.summary, e.when, e.kind, e.story, ...(e.related || [])].join(' ').replace(/\*\*/g, '')).toLowerCase();
+
+  function viewDict(arg) {
+    const only = arg && arg.startsWith('u.') && unitById[arg.slice(2)] ? arg.slice(2) : '';
+    dictFilter.unit = only;
+    dictFilter.q = '';
+    $app.innerHTML = `
+      <div class="exam dict-page">
+        <a class="back" href="#/exam">← 심화 학습 홈</a>
+        <header class="page-head">
+          <h1>📖 역사 사전</h1>
+          <p>개념 노트의 핵심 낱말 <b>${EXAM_DICT.length}개</b>를 배경 이야기와 시험 포인트로 자세히 풀었어요. 개념 노트에서 밑줄 친 낱말을 눌러도 바로 열려요.</p>
+        </header>
+        <label class="dict-search"><span aria-hidden="true">🔍</span><input type="search" data-dict-q placeholder="낱말 찾기 (예: 진대법, 을파소, 귀주)" aria-label="사전에서 낱말 찾기" autocomplete="off" enterkeyhint="search"></label>
+        <nav class="note-toc dict-units" aria-label="단원 고르기">
+          <button type="button" data-dict-unit="" aria-pressed="${!only}">전체 ${EXAM_DICT.length}</button>
+          ${EXAM_UNITS.map(u => {
+            const n = EXAM_DICT.filter(e => e.unit === u.id).length;
+            return n ? `<button type="button" data-dict-unit="${u.id}" aria-pressed="${only === u.id}" style="--era:${u.color}">${esc(u.short)} ${n}</button>` : '';
+          }).join('')}
+        </nav>
+        <p class="hint dict-count" id="dict-count" role="status"></p>
+        ${EXAM_UNITS.map((u, i) => {
+          const list = EXAM_DICT.filter(e => e.unit === u.id);
+          return list.length ? `
+          <section class="panel dict-group" data-dict-group="${u.id}" style="--era:${u.color}">
+            <h2>${i + 1}. ${esc(u.name)}</h2>
+            <ul class="dict-list">${list.map(e => `
+              <li data-dict-key="${esc(searchKey(e))}" data-dict-name="${esc(squash([e.term, e.id, ...(e.aliases || [])].join(' ')).toLowerCase())}">
+                <button type="button" class="dict-item" data-term-id="${esc(e.id)}">
+                  <span class="dict-item-head"><b>${esc(e.term)}</b>${imgsFor(e).length ? '<span class="dict-pic" title="사진 있음" aria-label="사진 있음">📷</span>' : ''}<small>${esc(e.kind)} · ${esc(e.when)}</small></span>
+                  <span class="dict-item-sum">${esc(e.summary.replace(/\*\*/g, ''))}</span>
+                </button>
+              </li>`).join('')}
+            </ul>
+          </section>` : '';
+        }).join('')}
+        <p class="panel dict-empty" hidden>찾는 낱말이 없어요. 띄어쓰기 없이 짧게 다시 찾아보거나, 단원을 ‘전체’로 바꿔 보세요.</p>
+      </div>`;
+    applyDictFilter();
+  }
+
+  function applyDictFilter() {
+    const q = squash(dictFilter.q).toLowerCase();
+    let shown = 0;
+    $app.querySelectorAll('[data-dict-group]').forEach(g => {
+      let n = 0;
+      const unitOk = !dictFilter.unit || g.dataset.dictGroup === dictFilter.unit;
+      g.querySelectorAll('li[data-dict-key]').forEach(li => {
+        const ok = unitOk && (!q || li.dataset.dictKey.includes(q));
+        li.hidden = !ok;
+        // 낱말 이름에 맞는 것을 앞에 보여 줘요
+        li.style.order = q && !li.dataset.dictName.includes(q) ? '1' : '';
+        if (ok) n++;
+      });
+      g.hidden = !n;
+      shown += n;
+    });
+    $app.querySelectorAll('[data-dict-unit]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.dictUnit === dictFilter.unit)));
+    const cnt = document.getElementById('dict-count');
+    if (cnt) cnt.textContent = q || dictFilter.unit ? `${shown}개 낱말을 찾았어요.` : `모두 ${shown}개 낱말이 있어요. 낱말을 누르면 자세한 설명이 열려요.`;
+    const empty = $app.querySelector('.dict-empty');
+    if (empty) empty.hidden = shown > 0;
+  }
+
   // ---------- 문제 풀기 (단원 · 섞어 풀기 · 오답 노트) ----------
   let drill = null;
 
@@ -299,12 +559,14 @@
     let qids;
     if (key === 'wrong') qids = A.shuffle(Object.keys(d.wrong).filter(id => qById[id]));
     else if (key === 'mix') qids = A.shuffle(EXAM_QUESTIONS.map(q => q.id)).slice(0, MIX_LEN);
+    else if (key.startsWith('t.')) qids = A.shuffle(termQs(fromKey(key)).map(q => q.id));
     else {
       // 안 풀어 본 문제를 먼저, 그다음 정답률이 낮은 문제 순으로
       const rate = q => { const s = d.stats[q.id]; return s ? s[1] / s[0] : -1; };
       qids = A.shuffle(unitQs(key)).sort((a, b) => rate(a) - rate(b)).map(q => q.id);
     }
-    const title = key === 'wrong' ? '❗ 오답 노트' : key === 'mix' ? '🎲 전 단원 섞어 풀기' : `✏️ ${unitById[key].name}`;
+    const title = key === 'wrong' ? '❗ 오답 노트' : key === 'mix' ? '🎲 전 단원 섞어 풀기'
+      : key.startsWith('t.') ? `✏️ ‘${esc(termTitle(fromKey(key)))}’ 관련 문제` : `✏️ ${unitById[key].name}`;
     if (!qids.length) {
       $app.innerHTML = `
         <div class="exam">
@@ -727,7 +989,19 @@
     }
   });
 
+  document.addEventListener('input', e => {
+    if (e.target.matches('[data-dict-q]')) { dictFilter.q = e.target.value; applyDictFilter(); }
+  });
+
   document.addEventListener('click', e => {
+    const term = e.target.closest('[data-term], [data-term-id]');
+    if (term) {
+      openTerm(term.dataset.term || '', term.dataset.termUnit || '', { id: term.dataset.termId || null, fromModal: !!term.closest('#modal') });
+      return;
+    }
+    if (e.target.closest('[data-dict-back]')) { dictBack(); return; }
+    const du = e.target.closest('[data-dict-unit]');
+    if (du) { dictFilter.unit = du.dataset.dictUnit; applyDictFilter(); return; }
     const jump = e.target.closest('[data-exam-jump]');
     if (jump) {
       const target = document.getElementById(jump.dataset.examJump);
