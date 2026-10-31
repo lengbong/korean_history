@@ -586,7 +586,7 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
 .avatar-opt input:checked + span { border-color: var(--yellow); background: #fff4d6; transform: scale(1.06); }
 .avatar-opt input:focus-visible + span, .level-opt input:focus-visible + span { outline: 3px solid var(--blue); outline-offset: 2px; }
 
-.levels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
 .level-opt span {
   display: flex; flex-direction: column; gap: 2px; height: 100%; padding: 12px 14px; cursor: pointer;
   border-radius: 16px; border: 3px solid var(--line); background: var(--paper-2);
@@ -594,6 +594,7 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
 .level-opt b { font-family: var(--font-display); font-weight: 400; font-size: 1.2rem; }
 .level-opt small { color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
 .level-opt input:checked + span { border-color: var(--green); background: var(--good-bg); }
+.level-opt input[value="3"]:checked + span { border-color: var(--blue); background: #eef3ff; }
 
 /* ---------- 팝업 ---------- */
 .modal {
@@ -660,6 +661,7 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
 .exam-banner-text b { font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; }
 .exam-banner-text small { opacity: 0.92; line-height: 1.45; }
 .exam-banner-go { font-size: 2rem; line-height: 1; }
+.hero + .exam-banner { margin: 0 0 16px; }
 
 .exam .stat-num { font-size: 1.35rem; }
 .exam-actions { display: grid; gap: 12px; margin: 16px 0 6px; }

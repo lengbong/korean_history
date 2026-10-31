@@ -12,7 +12,10 @@
   const LEVELS = {
     1: { name: '쉬움', icon: '🌱', hint: '7~9살 추천 · 쉬운 말과 쉬운 문제' },
     2: { name: '보통', icon: '🌳', hint: '10살 이상 추천 · 더 자세한 이야기와 문제' },
+    3: { name: '심화', icon: '🎓', hint: '중고생·어른 추천 · 한국사능력검정시험 심화 대비 (탐험·퀴즈는 보통 수준)' },
   };
+  // 심화(3) 대원도 아이용 탐험·퀴즈에서는 보통(2) 수준으로 봐요
+  const nextLevel = l => (l % 3) + 1;
   const TRACKS = {
     kr: { id: 'kr', name: '한국사', icon: '🐯', eras: ERAS, mix: 'mix' },
     world: { id: 'world', name: '세계사', icon: '🌍', eras: WORLD_ERAS, mix: 'mixw' },
@@ -321,6 +324,12 @@
   function viewHome() {
     const p = me();
     const stamps = t => TRACKS[t].eras.filter(e => p.stamps.includes(e.id)).length;
+    const examBanner = `
+      <a class="exam-banner" href="#/exam">
+        <span class="exam-banner-icon" aria-hidden="true">🎓</span>
+        <span class="exam-banner-text"><b>한국사능력검정시험 심화 대비</b><small>중고생·어른용 · 개념 노트, 사료형 문제, 오답 노트, 실전 모의고사</small></span>
+        <span class="exam-banner-go" aria-hidden="true">›</span>
+      </a>`;
     const tile = (href, emoji, title, sub, color) =>
       `<a class="menu-tile" href="${href}" style="--tile:${color}"><span class="menu-emoji" aria-hidden="true">${emoji}</span><span class="menu-title">${title}</span><span class="menu-sub">${sub}</span></a>`;
     $app.innerHTML = `
@@ -331,6 +340,7 @@
           <p>나는 역사 탐험대장 <b>범이</b>야. 오늘은 어떤 모험을 떠나 볼까?</p>
         </div>
       </section>
+      ${p.level === 3 ? examBanner : ''}
       <nav class="menu-grid" aria-label="놀이 고르기">
         ${tile('#/timeline/kr', '🗺️', '한국사 탐험', '선사 시대부터 지금의 대한민국까지 시간 여행', '#2a9a63')}
         ${tile('#/timeline/world', '🌍', '세계사 탐험', '피라미드부터 우주 탐사까지 세계 여행', '#1f8a8a')}
@@ -338,11 +348,7 @@
         ${tile('#/cards', '🃏', '카드 도감', '인물과 문화유산 카드를 모아요', '#8a5cc7')}
         ${tile('#/order', '🔢', '순서 맞추기', '무엇이 먼저 일어났을까?', '#e04848')}
       </nav>
-      <a class="exam-banner" href="#/exam">
-        <span class="exam-banner-icon" aria-hidden="true">🎓</span>
-        <span class="exam-banner-text"><b>한국사능력검정시험 심화 대비</b><small>중고생·어른용 · 개념 노트, 사료형 문제, 오답 노트, 실전 모의고사</small></span>
-        <span class="exam-banner-go" aria-hidden="true">›</span>
-      </a>
+      ${p.level === 3 ? '' : examBanner}
       <section class="panel">
         <h2>🎒 ${esc(p.name)} 대원의 탐험 기록</h2>
         <div class="stats">
@@ -562,7 +568,7 @@
 
   function buildQuiz(id) {
     const level = me().level;
-    const allowed = q => level === 2 || q.level === 1;
+    const allowed = q => level >= 2 || q.level === 1;
     let qs;
     if (MIX_IDS[id]) {
       // 시대마다 한 문제씩 뽑고, 모자란 만큼 더 채워요
@@ -572,7 +578,7 @@
       qs = shuffle(firsts.concat(rest).slice(0, MIX_LEN));
     } else {
       const pool = ALL_QUESTIONS.filter(q => q.era === id && allowed(q));
-      if (level === 2) {
+      if (level >= 2) {
         const hard = shuffle(pool.filter(q => q.level === 2)).slice(0, 3);
         const easy = shuffle(pool.filter(q => q.level === 1)).slice(0, QUIZ_LEN - hard.length);
         qs = shuffle(hard.concat(easy));
@@ -834,7 +840,7 @@
         <h2 class="visually-hidden">사건 카드</h2>
         <div class="pool">${o.items.map((ev, k) => placed.has(ev) ? '' : `<button class="event" type="button" data-action="place" data-k="${k}">${eventInner(ev)}</button>`).join('')}</div>
         <div class="cta-row">
-          ${o.level === 2 ? `<button class="btn btn-ghost" type="button" data-action="order-hint" aria-pressed="${o.hint}">💡 시대 힌트 ${o.hint ? '끄기' : '보기'}</button>` : ''}
+          ${o.level >= 2 ? `<button class="btn btn-ghost" type="button" data-action="order-hint" aria-pressed="${o.hint}">💡 시대 힌트 ${o.hint ? '끄기' : '보기'}</button>` : ''}
           <button class="btn btn-ghost" type="button" data-action="order-reset" ${placed.size ? '' : 'disabled'}>↩ 처음부터</button>
           <button class="btn btn-blue" type="button" data-action="order-check" ${full ? '' : 'disabled'}>✅ 정답 확인</button>
         </div>`;
@@ -903,7 +909,7 @@
             ${on ? '<span class="now">지금 대원</span>' : ''}
           </button>
           <div class="player-tools">
-            <button class="mini" type="button" data-action="toggle-level" data-id="${p.id}">난이도: ${lv.icon} ${lv.name} → ${LEVELS[3 - p.level].icon} ${LEVELS[3 - p.level].name}</button>
+            <button class="mini" type="button" data-action="toggle-level" data-id="${p.id}">난이도: ${lv.icon} ${lv.name} → ${LEVELS[nextLevel(p.level)].icon} ${LEVELS[nextLevel(p.level)].name}</button>
             <button class="mini danger" type="button" data-action="delete" data-id="${p.id}">🗑️ 삭제</button>
           </div>
         </li>`;
@@ -918,7 +924,7 @@
         </fieldset>
         <fieldset class="field">
           <legend>난이도</legend>
-          <div class="levels">${[1, 2].map(l => `<label class="level-opt"><input type="radio" name="level" value="${l}" ${l === 1 ? 'checked' : ''}><span><b>${LEVELS[l].icon} ${LEVELS[l].name}</b><small>${LEVELS[l].hint}</small></span></label>`).join('')}</div>
+          <div class="levels">${[1, 2, 3].map(l => `<label class="level-opt"><input type="radio" name="level" value="${l}" ${l === 1 ? 'checked' : ''}><span><b>${LEVELS[l].icon} ${LEVELS[l].name}</b><small>${LEVELS[l].hint}</small></span></label>`).join('')}</div>
         </fieldset>
         <button class="btn btn-green" type="submit">🚀 탐험 시작!</button>
       </form>` : `<p class="hint">대원은 ${MAX_PLAYERS}명까지 등록할 수 있어요.</p>`}`;
@@ -932,13 +938,14 @@
       id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name,
       avatar: AVATARS.includes(data.get('avatar')) ? data.get('avatar') : AVATARS[0],
-      level: data.get('level') === '2' ? 2 : 1,
+      level: LEVELS[data.get('level')] ? Number(data.get('level')) : 1,
     });
     state.players.push(p);
     state.currentId = p.id;
     save();
     sfx.win();
-    location.hash = '#/home';
+    // 심화 대원은 바로 한능검 심화 학습으로 안내해요
+    location.hash = p.level === 3 ? '#/exam' : '#/home';
   }
 
   function deletePlayer(id) {
@@ -1017,7 +1024,7 @@
         break;
       case 'toggle-level': {
         const target = state.players.find(x => x.id === act.dataset.id);
-        if (target) { target.level = 3 - target.level; save(); viewPlayers(); sfx.tap(); }
+        if (target) { target.level = nextLevel(target.level); save(); viewPlayers(); sfx.tap(); }
         break;
       }
       case 'delete': deletePlayer(act.dataset.id); break;
