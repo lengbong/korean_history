@@ -887,11 +887,16 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
   background: color-mix(in srgb, var(--era) 9%, white); border: 2px solid color-mix(in srgb, var(--era) 25%, white);
 }
 .dict-pop b { color: color-mix(in srgb, var(--era) 70%, black); }
+.dict-figs { margin: 0 0 12px; }
+.dict-figs.n2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+.dict-figs.n2 .dict-fig { margin: 0; }
+.dict-figs.n2 .dict-fig img { height: 170px; max-height: none; }
+.dict-figs.n2 figcaption { font-size: 0.85rem; padding: 6px 8px 8px; }
 .dict-fig { margin: 0 0 12px; background: var(--paper-2); border: 2px solid var(--line); border-radius: 14px; overflow: hidden; }
 .dict-fig img { display: block; width: 100%; max-height: 300px; object-fit: contain; background: #f3eee4; }
 .dict-fig figcaption { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 3px; font-size: 0.93rem; line-height: 1.45; }
 .dict-fig figcaption b { color: var(--ink); }
-.dict-fig small { color: var(--muted); font-size: 0.78rem; line-height: 1.45; word-break: break-all; }
+.dict-fig small { color: var(--muted); font-size: 0.78rem; line-height: 1.45; overflow-wrap: anywhere; }
 .dict-fig small a { color: inherit; }
 .dict-sec { margin: 0 0 12px; }
 .dict-pop .note-story, .dict-pop .note-tip { margin: 0 0 12px; }

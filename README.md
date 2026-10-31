@@ -79,6 +79,8 @@ js/exam-plus1~3.js 한능검 심화: 개념 노트 보강(흐름 이야기·시�
 js/exam-images.js 한능검 심화: 노트 사진 목록과 출처
 js/exam-dict1~4.js 한능검 심화: 역사 사전(노트 낱말을 누르면 열리는 자세한 설명)
 img/notes/      한능검 심화: 노트 사진(JPEG)과 credits.json
+js/exam-dict-images.js 한능검 심화: 역사 사전 사진 목록과 출처 (dict: 사진을 보여 줄 낱말)
+img/dict/       한능검 심화: 역사 사전 사진(JPEG)과 credits.json
 js/exam-view.js 한능검 심화 화면(학습 홈, 노트, 문제 풀이, 오답 노트, 모의고사, 결과)
 ```
 
@@ -142,6 +144,54 @@ js/exam-view.js 한능검 심화 화면(학습 홈, 노트, 문제 풀이, 오�
 | 창덕궁 인정전 | Bernard Gagnon | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) | [원본](https://commons.wikimedia.org/wiki/File:Injeongjeon_Hall_01.jpg) |
 | 광주 남한산성 성벽 | Noh Mun Duek | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [원본](https://commons.wikimedia.org/wiki/File:Wall_of_Namhansanseong_Fortress_(남한산성).jpg) |
 | 독도 (동도와 서도) | Korea.net / 해외문화홍보원 (KOCIS) | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0) | [원본](https://commons.wikimedia.org/wiki/File:KOCIS_Dokdo_Islands_(4925397371).jpg) |
+
+### 역사 사전 사진
+
+역사 사전 팝업의 사진 41장도 같은 기준(퍼블릭 도메인, CC0, CC BY, CC BY-SA, 공공누리 제1유형)으로 위키미디어 공용에서 골랐어요. 원본 정보는 `img/dict/credits.json`에 있고, 노트 사진 중 낱말에 꼭 맞는 것은 사전에서도 함께 보여 줘요.
+
+| 사진 | 지은이 | 라이선스 | 출처 |
+| --- | --- | --- | --- |
+| 반달 돌칼 (부여 송국리 유적 출토) | 국립중앙박물관 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:부여_송국리_유적_출토_반달돌칼.jpg) |
+| 세형 동검 (평양 상리 출토) | AsPJT | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) | [원본](https://commons.wikimedia.org/wiki/File:Slender_bronze_dagger_in_Korea_in_1933.jpg) |
+| 칠지도 복제품 (한성백제박물관 전시, 원품은 일본 이소노카미 신궁 소장) | Gary Todd | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) | [원본](https://commons.wikimedia.org/wiki/File:Chiljido_Seven-Branched_Sword_%2829899285180%29.jpg) |
+| 경주 첨성대 | Roadgo | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [원본](https://commons.wikimedia.org/wiki/File:경주_첨성대.jpg) |
+| 충주 고구려비 (2006년 촬영) | Lawinc82 | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [원본](https://commons.wikimedia.org/wiki/File:Chungju_Goguryeo_Stele.JPG) |
+| 북한산 신라 진흥왕 순수비 (국립중앙박물관 전시) | Ethan Doyle White | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | [원본](https://commons.wikimedia.org/wiki/File:Silla_Period_Monument_from_Bukhansan_on_display_in_the_National_Museum_of_Korea.jpg) |
+| 부여 정림사지 5층 석탑 | Bernard Gagnon | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) | [원본](https://commons.wikimedia.org/wiki/File:Jeongnimsa_Temple_04.jpg) |
+| 경주 분황사 모전 석탑 | Black207 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | [원본](https://commons.wikimedia.org/wiki/File:Gyeongju_Bunhwangsa_Mojeonseoktap_shot_by_Black207_for_WLM_2016.jpg) |
+| 서산 용현리 마애여래삼존상 (백제) | Brian Chandra | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | [원본](https://commons.wikimedia.org/wiki/File:Rock_carved_Buddha_triad_in_Seosan,_South_Korea.jpg) |
+| 무용총 수렵도 (고구려 고분 벽화) | 작자 미상 (출처: 문화유산 연구지식포털 portal.nrich.go.kr) | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:Muyongchong_Suryeopdo.jpg) |
+| 경주 천마총 금관 (국보) | 국립중앙박물관 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:천마총_금관.jpg) |
+| 황룡사 9층 목탑 1/10 축소 모형 | 경주시 (Gyeongju City) | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:A_scale_model_of_Hwangnyongsa_pagoda.jpg) |
+| 가야의 철제 판갑옷 (국립중앙박물관 전시) | Gary Todd | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) | [원본](https://commons.wikimedia.org/wiki/File:Gaya_Confederacy_Iron_Armor_%2817972709756%29.jpg) |
+| 최치원 초상 (1793년, 하동 운암영당 소장) | 작자 미상 | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Choe_Chiwon.jpg) |
+| 무구정광대다라니경 복제품 (국립중앙박물관 전시) | Naturehead | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Dharani_sutra.jpg) |
+| 안향 초상 (국보, 영주 소수 서원 소장) | 작자 미상 | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Korea-National.Treasure-111-An.Hyang-Goryeo-Sosu.Seowon.jpg) |
+| 안동 봉정사 극락전 | Steve46814 | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [원본](https://commons.wikimedia.org/wiki/File:Korea-Andong-Bongjeongsa_3040-06_Geungnakjeon.JPG) |
+| 삼국사기 (국보) | 문화재청 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:삼국사기_%28국보_제322-2호%29_01.jpg) |
+| 삼국유사 권3~5 (국보) | 문화재청 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:삼국유사.jpg) |
+| 앙부일구 (서울 경복궁 전시) | Bernat (Flickr) | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | [원본](https://commons.wikimedia.org/wiki/File:Seoul-Gyeongbokgung-Sundial-02.jpg) |
+| 보루각 자격루 (2011년 덕수궁 광명문 전시 모습) | Gapo | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [원본](https://commons.wikimedia.org/wiki/File:BoRuGak_Jagyeongnu.JPG) |
+| 경국대전 (1661년 간행본, 국립중앙박물관 소장) | 猫猫的日记本 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | [원본](https://commons.wikimedia.org/wiki/File:Gyeongguk_daejeon_in_the_National_Museum_of_Korea_2016-11.jpg) |
+| 영주 소수 서원 강학당 | Kwkhh | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | [원본](https://commons.wikimedia.org/wiki/File:소수서원_강학당.jpg) |
+| 거북선 복원 모형 (경남 통영항) | Junho Jung (phploveme) | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [원본](https://commons.wikimedia.org/wiki/File:Korea-Tongyeong_Port-Turtle_ship_replica-03.jpg) |
+| 조선왕조실록 태백산 사고본 (국보) | 국가유산청 (구 문화재청) | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:조선왕조실록_태백산사고본.jpg) |
+| 송시열 초상 (국립중앙박물관 소장) | 작자 미상 (사진: 국립중앙박물관) | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:송시열_초상.jpg) |
+| 흥선 대원군 이하응 초상, 금관조복본 (1869년, 보물, 국립중앙박물관 소장) | 이한철·유숙 추정 (사진: 국립중앙박물관) | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:이하응_초상.jpg) |
+| 거중기 복원 모형 (수원 화성 박물관 앞) | 잉여빵 | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [원본](https://commons.wikimedia.org/wiki/File:수원_화성_거중기.jpg) |
+| 신윤복, 단오풍정 (혜원 풍속도첩, 간송미술관 소장) | 신윤복 (申潤福) | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Hyewon-Dano.pungjeong.jpg) |
+| 『열하일기』 도강록이 실린 『연암집』 권1 표지 (한국학중앙연구원 소장) | 박지원 (원저자) / 한국학중앙연구원 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:Pak_Chiwŏn_Yeolha_ilgi.jpg) |
+| 동의보감 (국보) | 문화재청 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:동의보감%28319-1%29.jpg) |
+| 상평통보 | 국립중앙박물관 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:상평통보.jpg) |
+| 고종 황제 (1904년경 사진) | George Grantham Bain Collection (미국 의회도서관) | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Kojong,_emperor_of_Korea,_1852-1919_LCCN2003666654.jpg) |
+| 서울로 압송되는 전봉준 (1895년 2월 27일) | 무라카미 덴신 (村上天眞) | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Jeon_Bong-jun_under_arrest_%2827_February_1895%29.jpg) |
+| 안중근 (1910년 이전 촬영) | 작자 미상 | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:An_Jung-geun.JPG) |
+| 환구단 황궁우 (서울) | 문화재청 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:황궁우.jpg) |
+| 유관순 (1920년경) | 작자 미상 | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Ryu_Gwan-sun.jpg) |
+| 도산 안창호 (1920년경) | 작자 미상 | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Dosan_Ahn_Chang-ho_in_1919.jpg) |
+| 판문점 공동 경비 구역(JSA), 남쪽에서 북쪽을 바라본 모습 (2016년) | Travis Wise | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | [원본](https://commons.wikimedia.org/wiki/File:Demilitarized_Zone_%28DMZ%29_Joint_Security_Area_%28JSA%29_Looking_Into_North_Korea_%2828819154694%29.jpg) |
+| 신미양요 때 미군이 광성보에서 빼앗아 간 수자기 (1871년 6월, 콜로라도호) | 펠리체 베아토 (Felice Beato) | 퍼블릭 도메인 | [원본](https://commons.wikimedia.org/wiki/File:Sujagi.jpg) |
+| 상평통보 당백전 | 국립중앙박물관 | [공공누리 제1유형](https://www.kogl.or.kr/info/licenseType1.do) | [원본](https://commons.wikimedia.org/wiki/File:상평통보_당백전.jpg) |
 
 ## 알아 두세요
 

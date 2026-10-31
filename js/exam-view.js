@@ -448,11 +448,11 @@
         <p class="dict-meta"><span class="chip">${esc(e.kind)}</span><span class="chip">${esc(u.short || '')}</span><span class="dict-when">${esc(e.when)}</span></p>
         <h2 class="dict-title">${esc(e.term)}</h2>
         <p class="dict-sum">${fmt(e.summary)}</p>
-        ${imgs.map(m => `
+        ${imgs.length ? `<div class="dict-figs n${imgs.length}">${imgs.map(m => `
           <figure class="dict-fig">
             <img src="${esc(m.file)}" alt="${esc(m.caption)}" loading="lazy" decoding="async">
             <figcaption><b>${esc(m.caption)}</b><small>${credit(m)}</small></figcaption>
-          </figure>`).join('')}
+          </figure>`).join('')}</div>` : ''}
         <section class="dict-sec note-story"><p class="note-label">📖 자세한 이야기</p><p>${fmtTerms(e.story, e.unit, self)}</p></section>
         ${e.points && e.points.length ? `<section class="dict-sec note-tip"><p class="note-label">💡 시험 포인트·함정</p><ul>${e.points.map(t => `<li>${fmtTerms(t, e.unit, self)}</li>`).join('')}</ul></section>` : ''}
         ${rel.length ? `<section class="dict-sec"><p class="note-label">🔗 함께 보면 좋은 낱말</p><div class="dict-rel">${rel.map(r => (linkState(r, e.unit)
