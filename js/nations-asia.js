@@ -3,6 +3,12 @@
  */
 
 NATION_IMAGES.push(
+  { id: 'china-longmen', file: 'img/nations/china-longmen.jpg', caption: '룽먼 석굴 봉선사동의 노사나 대불 (중국 뤄양, 당나라 675년 완성)', author: 'Gary Todd', license: 'CC0 (퍼블릭 도메인)', license_url: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:Ancient_Buddhist_Grottoes_at_Longmen-_Fengxian_Temple,_Vairocana_Buddha.jpg' },
+  { id: 'china-opium', file: 'img/nations/china-opium.jpg', caption: '제1차 아편 전쟁 때 영국 철제 증기선 네메시스호가 청나라 전투선을 부수는 장면 (E. 덩컨, 1843년 판화)', author: 'Edward Duncan', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Destroying_Chinese_war_junks,_by_E._Duncan_(1843).jpg' },
+  { id: 'china-terracotta', file: 'img/nations/china-terracotta.jpg', caption: '진시황릉 병마용 1호갱 (중국 시안)', author: 'Gary Todd', license: 'CC0 (퍼블릭 도메인)', license_url: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:Qin_Shihuang_Terracotta_Army,_Pit_1.jpg' },
+  { id: 'japan-tongsinsa', file: 'img/nations/japan-tongsinsa.jpg', caption: '에도(지금의 도쿄)에 들어가는 조선 통신사 행렬 (하네가와 도에이, 1748년)', author: 'Hanegawa Tōei', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Joseon_procession_in_Edo_1748.jpg' },
+  { id: 'mongolia-genghis', file: 'img/nations/mongolia-genghis.jpg', caption: '칭기즈 칸의 초상 (원나라 궁정 화가, 타이베이 국립 고궁 박물원)', author: '원나라 궁정 화가 (작자 미상)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Genghis_Khan.jpg' },
+  { id: 'mongolia-kublai', file: 'img/nations/mongolia-kublai.jpg', caption: '쿠빌라이 칸의 초상 (원나라 궁정 화가, 타이베이 국립 고궁 박물원)', author: '원나라 궁정 화가 (네팔 출신 아니게의 그림으로 전해짐)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Kublai_Khan_square.jpg' },
   /*IMAGES*/
 );
 

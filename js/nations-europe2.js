@@ -3,6 +3,14 @@
  */
 
 NATION_IMAGES.push(
+  { id: 'france-joan', file: 'img/nations/france-joan.jpg', caption: '앵그르, 〈샤를 7세의 대관식에 선 잔 다르크〉 (1854년, 프랑스 루브르 박물관)', author: 'Nick Thweatt (사진) · Jean-Auguste-Dominique Ingres (그림)', license: 'CC BY-SA 3.0', license_url: 'https://creativecommons.org/licenses/by-sa/3.0', source: 'https://commons.wikimedia.org/wiki/File:Jeanne_d’Arc_au_sacre_de_Charles_VII_by_Ingres_Louvre_Paris_20120629.jpg' },
+  { id: 'france-louis14', file: 'img/nations/france-louis14.jpg', caption: '이아생트 리고, 〈루이 14세의 초상〉 (1701년, 프랑스 루브르 박물관)', author: 'Hyacinthe Rigaud', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Rigaud_Louis_XIV_1701.jpg' },
+  { id: 'france-marie', file: 'img/nations/france-marie.jpg', caption: '엘리자베트 비제 르브룅, 〈장미를 든 마리 앙투아네트〉 (1783년, 베르사유 궁전)', author: 'Élisabeth Vigée Le Brun', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Vig%C3%A9e-Lebrun_Marie_Antoinette_1783.jpg' },
+  { id: 'france-napoleon', file: 'img/nations/france-napoleon.jpg', caption: '자크 루이 다비드, 〈알프스를 넘는 나폴레옹〉 (1801년, 프랑스 말메종 성)', author: 'Jacques-Louis David', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:David_-_Napoleon_crossing_the_Alps_-_Malmaison1.jpg' },
+  { id: 'germany-gutenberg', file: 'img/nations/germany-gutenberg.jpg', caption: '구텐베르크 성경 (1455년 무렵, 미국 뉴욕 공공 도서관 소장본)', author: 'NYC Wanderer (Kevin Eng)', license: 'CC BY-SA 2.0', license_url: 'https://creativecommons.org/licenses/by-sa/2.0', source: 'https://commons.wikimedia.org/wiki/File:Gutenberg_Bible,_Lenox_Copy,_New_York_Public_Library,_2009._Pic_01.jpg' },
+  { id: 'germany-luther', file: 'img/nations/germany-luther.jpg', caption: '루카스 크라나흐, 〈마르틴 루터의 초상〉 (1528년, 독일 코부르크 성)', author: 'Lucas Cranach the Elder', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Lucas_Cranach_d.%C3%84._-_Martin_Luther,_1528_(Veste_Coburg).jpg' },
+  { id: 'russia-1812', file: 'img/nations/russia-1812.jpg', caption: '아돌프 노르텐, 〈모스크바에서 물러나는 나폴레옹〉 (19세기)', author: 'Adolph Northen', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Napoleons_retreat_from_Moscow_by_Adolph_Northen.jpg' },
+  { id: 'russia-peter', file: 'img/nations/russia-peter.jpg', caption: '고드프리 넬러, 〈표트르 대제의 초상〉 (1698년, 영국 왕실 소장)', author: 'Sir Godfrey Kneller', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Sir_Godfrey_Kneller_(1646-1723)_-_Peter_the_Great,_Tsar_of_Russia_(1672-1725)_-_RCIN_405645_-_Royal_Collection.jpg' },
   /*IMAGES*/
 );
 
