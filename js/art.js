@@ -46,6 +46,13 @@ const ART = (() => {
   const trigram = (dist, lines) => lines.map((broken, i) => bar(-(dist - 5 + i * 5) - 1.67, broken)).join('');
   const D = 36.67;
 
+  // 피라미드의 돌 단 (꼭짓점 52,30 · 밑변 10~94, y=99)
+  const pyramidCourses = range(6).map(i => {
+    const y = 40 + i * 10;
+    const half = (y - 30) * (42 / 69);
+    return `<line x1="${(52 - half).toFixed(1)}" y1="${y}" x2="${(52 + half).toFixed(1)}" y2="${y}"/>`;
+  }).join('');
+
   return {
     jumeok: svg(`
       <ellipse cx="60" cy="108" rx="34" ry="5" fill="#000" opacity=".08"/>
@@ -174,5 +181,54 @@ const ART = (() => {
       <rect x="40" y="16" width="40" height="9" fill="#d3ccbe" stroke="#7d756a" stroke-width="2.5"/>
       <rect x="44" y="40" width="32" height="12" fill="#fff" stroke="#7d756a" stroke-width="2"/>
       <text x="60" y="49.5" font-size="8.5" text-anchor="middle" fill="#3a2e27" font-family="Jua, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">독립문</text>`),
+
+    // ---------- 세계사 ----------
+    pyramid: svg(`
+      <circle cx="96" cy="24" r="11" fill="#f7b733"/>
+      <rect x="2" y="96" width="116" height="16" rx="5" fill="#ecd29b"/>
+      <path d="M10 99 L52 30 L94 99Z" fill="#e3b866" stroke="#8a6420" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M52 30 L94 99 H70Z" fill="#c9973f"/>
+      <g stroke="#8a6420" stroke-width="1.4" opacity=".55">${pyramidCourses}</g>
+      <path d="M72 99 L94 64 L116 99Z" fill="#e3b866" stroke="#8a6420" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M94 64 L116 99 H104Z" fill="#c9973f"/>`),
+
+    greatwall: svg(`
+      <path d="M0 74 L20 46 L40 66 L62 34 L86 62 L104 40 L120 56 V120 H0Z" fill="#b7d39c"/>
+      <path d="M0 96 Q30 70 60 88 T120 78 V120 H0Z" fill="#8bc34a"/>
+      <path d="M-4 90 L24 74 L46 82 L72 60 L98 70 L124 54" fill="none" stroke="#7d6a4f" stroke-width="16" stroke-linejoin="round"/>
+      <path d="M-4 90 L24 74 L46 82 L72 60 L98 70 L124 54" fill="none" stroke="#d6c3a0" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M-4 82 L24 66 L46 74 L72 52 L98 62 L124 46" fill="none" stroke="#7d6a4f" stroke-width="5" stroke-dasharray="3.5 3"/>
+      <g fill="#d6c3a0" stroke="#7d6a4f" stroke-width="2.5">
+        <rect x="16" y="52" width="16" height="26"/><rect x="64" y="38" width="16" height="26"/>
+      </g>
+      <g fill="#7d6a4f">
+        <rect x="15" y="47" width="4" height="6"/><rect x="22" y="47" width="4" height="6"/><rect x="29" y="47" width="4" height="6"/>
+        <rect x="63" y="33" width="4" height="6"/><rect x="70" y="33" width="4" height="6"/><rect x="77" y="33" width="4" height="6"/>
+        <rect x="21" y="60" width="6" height="8" rx="3"/><rect x="69" y="46" width="6" height="8" rx="3"/>
+      </g>`),
+
+    castle: svg(`
+      <rect x="4" y="104" width="112" height="9" rx="4.5" fill="#6fa8dc"/>
+      <rect x="24" y="56" width="72" height="50" fill="#cfc6b8" stroke="#6d6458" stroke-width="3"/>
+      <g fill="#cfc6b8" stroke="#6d6458" stroke-width="2.5">${range(6).map(i => `<rect x="${27 + i * 12}" y="48" width="7" height="9"/>`).join('')}</g>
+      <rect x="47" y="30" width="26" height="30" fill="#dcd4c7" stroke="#6d6458" stroke-width="3"/>
+      <path d="M43 32 L60 8 L77 32Z" fill="#2f6fd0" stroke="#1f4a8a" stroke-width="2.5" stroke-linejoin="round"/>
+      <g fill="#dcd4c7" stroke="#6d6458" stroke-width="3">
+        <rect x="8" y="40" width="22" height="66"/><rect x="90" y="40" width="22" height="66"/>
+      </g>
+      <g fill="#c0392b" stroke="#7b1f16" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M5 42 L19 14 L33 42Z"/><path d="M87 42 L101 14 L115 42Z"/>
+      </g>
+      <g stroke="#4e342e" stroke-width="2"><line x1="19" y1="14" x2="19" y2="4"/><line x1="101" y1="14" x2="101" y2="4"/></g>
+      <g fill="#f7b733"><path d="M19 4 L29 7 L19 10Z"/><path d="M101 4 L111 7 L101 10Z"/></g>
+      <g fill="#4e342e">
+        <rect x="16" y="58" width="6" height="10" rx="3"/><rect x="98" y="58" width="6" height="10" rx="3"/>
+        <rect x="57" y="40" width="6" height="10" rx="3"/>
+      </g>
+      <path d="M48 106 V86 A12 12 0 0 1 72 86 V106Z" fill="#5d4037" stroke="#3e2723" stroke-width="2"/>
+      <g stroke="#a1887f" stroke-width="1.5">
+        <line x1="54" y1="80" x2="54" y2="106"/><line x1="60" y1="76" x2="60" y2="106"/><line x1="66" y1="80" x2="66" y2="106"/>
+        <line x1="48" y1="92" x2="72" y2="92"/><line x1="48" y1="99" x2="72" y2="99"/>
+      </g>`),
   };
 })();

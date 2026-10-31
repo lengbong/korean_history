@@ -1,6 +1,7 @@
 /*
  * 범이의 한국사 탐험대 — 화면과 놀이 로직
  * 주소(#/...)에 따라 화면을 그리는 단일 페이지 앱입니다.
+ * 한국사(js/data.js)와 세계사(js/world.js) 데이터를 함께 사용해요.
  */
 (() => {
   'use strict';
@@ -11,16 +12,33 @@
     1: { name: '쉬움', icon: '🌱', hint: '7~9살 추천 · 쉬운 말과 쉬운 문제' },
     2: { name: '보통', icon: '🌳', hint: '10살 이상 추천 · 더 자세한 이야기와 문제' },
   };
+  const TRACKS = {
+    kr: { id: 'kr', name: '한국사', icon: '🐯', eras: ERAS, mix: 'mix' },
+    world: { id: 'world', name: '세계사', icon: '🌍', eras: WORLD_ERAS, mix: 'mixw' },
+  };
+  const MIX_IDS = { mix: 'kr', mixw: 'world' };
+  const ORDER_MODES = {
+    kr: { name: '한국사', icon: '🐯', note: '우리나라 역사 속 사건을 차례대로 놓아요.' },
+    world: { name: '세계사', icon: '🌍', note: '세계 역사 속 사건을 차례대로 놓아요.' },
+    mix: { name: '섞어서', icon: '🔀', note: '한국사와 세계사 사건이 섞여 나와요. 피라미드와 고조선, 무엇이 먼저일까요?' },
+  };
   const TYPE_NAMES = { person: '인물', heritage: '문화유산', symbol: '상징' };
   const QUIZ_LEN = 5;
   const MIX_LEN = 10;
   const MAX_PLAYERS = 8;
   const PRAISE = ['딩동댕! 정답이야! 🎉', '대단해! 역사 박사구나! 🎓', '맞았어! 최고야! 👍', '정답! 역시 우리 대원! ✨'];
 
+  ERAS.forEach(e => { e.track = 'kr'; });
+  WORLD_ERAS.forEach(e => { e.track = 'world'; });
+  const ALL_ERAS = ERAS.concat(WORLD_ERAS);
+  const ALL_QUESTIONS = QUESTIONS.concat(WORLD_QUESTIONS);
+  const ALL_CARDS = CARDS.concat(WORLD_CARDS);
+  const ALL_EVENTS = EVENTS.concat(WORLD_EVENTS);
+
   const $app = document.getElementById('app');
   const $hud = document.getElementById('hud');
-  const eraById = Object.fromEntries(ERAS.map(e => [e.id, e]));
-  const cardById = Object.fromEntries(CARDS.map(c => [c.id, c]));
+  const eraById = Object.fromEntries(ALL_ERAS.map(e => [e.id, e]));
+  const cardById = Object.fromEntries(ALL_CARDS.map(c => [c.id, c]));
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---------- 작은 도구 ----------
@@ -40,20 +58,25 @@
     if (code < 0xac00 || code > 0xd7a3) return '(이)야';
     return (code - 0xac00) % 28 ? '이야' : '야';
   };
-  const cardsOfEra = id => CARDS.filter(c => c.era === id);
+  const trackOf = item => eraById[item.era].track;
+  const cardsOfEra = id => ALL_CARDS.filter(c => c.era === id);
+  const cardsOfTrack = t => ALL_CARDS.filter(c => trackOf(c) === t);
 
   // ---------- 저장 (이 기기의 브라우저에만) ----------
   let state = load();
 
   function load() {
-    const empty = { players: [], currentId: null, sound: true };
+    const empty = { players: [], currentId: null, sound: true, track: 'kr', orderMode: 'kr' };
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (!raw) return empty;
       const saved = JSON.parse(raw);
       if (!saved || !Array.isArray(saved.players)) return empty;
       saved.players = saved.players.map(p => Object.assign(blankPlayer(), p));
-      return Object.assign(empty, saved);
+      const s = Object.assign(empty, saved);
+      if (!TRACKS[s.track]) s.track = 'kr';
+      if (!ORDER_MODES[s.orderMode]) s.orderMode = 'kr';
+      return s;
     } catch (e) {
       return empty;
     }
@@ -68,6 +91,10 @@
   }
 
   const me = () => state.players.find(p => p.id === state.currentId) || null;
+
+  function setTrack(t) {
+    if (TRACKS[t] && state.track !== t) { state.track = t; save(); }
+  }
 
   // ---------- 효과음 (Web Audio) ----------
   let actx = null;
@@ -163,6 +190,16 @@
     if (restoreFocus && lastFocus && document.contains(lastFocus)) lastFocus.focus();
   }
 
+  // ---------- 공통 조각 ----------
+  // 한국사/세계사 고르기 (base 주소 뒤에 /kr, /world를 붙인 링크)
+  function trackSwitch(active, base) {
+    return `<nav class="seg" aria-label="한국사·세계사 고르기">${Object.values(TRACKS).map(t =>
+      `<a href="${base}/${t.id}" ${t.id === active ? 'aria-current="page"' : ''}>${t.icon} ${t.name}</a>`).join('')}</nav>`;
+  }
+
+  const eraChip = (era, withTrack) =>
+    `<span class="chip" style="--era:${era.color}">${withTrack ? TRACKS[era.track].icon : era.emoji} ${esc(era.short)}</span>`;
+
   // ---------- 카드 ----------
   const art = c => (c.art && ART[c.id]) ? ART[c.id] : `<span aria-hidden="true">${c.emoji}</span>`;
 
@@ -178,8 +215,9 @@
 
   function bigCard(c) {
     const era = eraById[c.era];
+    const track = TRACKS[era.track];
     return `<article class="bigcard" style="--era:${era.color}">
-      <div class="bigcard-top"><span class="badge">${TYPE_NAMES[c.type]}</span><span class="badge">${era.emoji} ${esc(era.name)}</span></div>
+      <div class="bigcard-top"><span class="badge">${track.icon} ${track.name}</span><span class="badge">${TYPE_NAMES[c.type]}</span><span class="badge">${era.emoji} ${esc(era.short)}</span></div>
       <div class="bigcard-art">${art(c)}</div>
       <h2 class="bigcard-name">${esc(c.name)}</h2>
       <p class="bigcard-nick">“${esc(c.nick)}”</p>
@@ -206,10 +244,11 @@
     </div>`, '잠긴 카드');
   }
 
-  // 아직 없는 카드를 골라 줍니다 (eraId가 없으면 모든 시대에서)
-  function takeLocked(eraId, n) {
+  // 아직 없는 카드를 골라 줍니다 (era나 track으로 범위를 좁혀요)
+  function takeLocked({ era, track } = {}, n) {
     const p = me();
-    const pool = CARDS.filter(c => (!eraId || c.era === eraId) && !p.cards.includes(c.id));
+    const pool = ALL_CARDS.filter(c =>
+      (!era || c.era === era) && (!track || trackOf(c) === track) && !p.cards.includes(c.id));
     return shuffle(pool).slice(0, n);
   }
 
@@ -271,15 +310,16 @@
   }
 
   // ---------- 홈 ----------
-  const ALL_FACTS = ERAS.flatMap(e => e.facts.map(f => ({ era: e, text: f })));
+  const ALL_FACTS = ALL_ERAS.flatMap(e => e.facts.map(f => ({ era: e, text: f })));
 
   function factHtml(f) {
-    return `<p class="fact-text"><span class="chip" style="--era:${f.era.color}">${f.era.emoji} ${esc(f.era.short)}</span> ${esc(f.text)}</p>
+    return `<p class="fact-text">${eraChip(f.era, true)} ${esc(f.text)}</p>
       <div class="row-gap"><button class="mini" type="button" data-action="next-fact">🎲 다른 이야기</button>${speakBtn(f.text)}</div>`;
   }
 
   function viewHome() {
     const p = me();
+    const stamps = t => TRACKS[t].eras.filter(e => p.stamps.includes(e.id)).length;
     const tile = (href, emoji, title, sub, color) =>
       `<a class="menu-tile" href="${href}" style="--tile:${color}"><span class="menu-emoji" aria-hidden="true">${emoji}</span><span class="menu-title">${title}</span><span class="menu-sub">${sub}</span></a>`;
     $app.innerHTML = `
@@ -291,7 +331,8 @@
         </div>
       </section>
       <nav class="menu-grid" aria-label="놀이 고르기">
-        ${tile('#/timeline', '🗺️', '시대 탐험', '선사 시대부터 지금까지 시간 여행을 떠나요', '#2a9a63')}
+        ${tile('#/timeline/kr', '🗺️', '한국사 탐험', '선사 시대부터 지금의 대한민국까지 시간 여행', '#2a9a63')}
+        ${tile('#/timeline/world', '🌍', '세계사 탐험', '피라미드부터 우주 탐사까지 세계 여행', '#1f8a8a')}
         ${tile('#/quiz', '❓', '역사 퀴즈', 'OX 퀴즈와 골라 맞히기에 도전!', '#2f6fd0')}
         ${tile('#/cards', '🃏', '카드 도감', '인물과 문화유산 카드를 모아요', '#8a5cc7')}
         ${tile('#/order', '🔢', '순서 맞추기', '무엇이 먼저 일어났을까?', '#e04848')}
@@ -299,8 +340,9 @@
       <section class="panel">
         <h2>🎒 ${esc(p.name)} 대원의 탐험 기록</h2>
         <div class="stats">
-          <div class="stat"><span class="stat-emoji" aria-hidden="true">🎖️</span><span class="stat-num">${p.stamps.length} / ${ERAS.length}</span><span class="stat-label">탐험 도장</span></div>
-          <div class="stat"><span class="stat-emoji" aria-hidden="true">🃏</span><span class="stat-num">${p.cards.length} / ${CARDS.length}</span><span class="stat-label">모은 카드</span></div>
+          <div class="stat"><span class="stat-emoji" aria-hidden="true">🐯</span><span class="stat-num">${stamps('kr')} / ${ERAS.length}</span><span class="stat-label">한국사 도장</span></div>
+          <div class="stat"><span class="stat-emoji" aria-hidden="true">🌍</span><span class="stat-num">${stamps('world')} / ${WORLD_ERAS.length}</span><span class="stat-label">세계사 도장</span></div>
+          <div class="stat"><span class="stat-emoji" aria-hidden="true">🃏</span><span class="stat-num">${p.cards.length} / ${ALL_CARDS.length}</span><span class="stat-label">모은 카드</span></div>
           <div class="stat"><span class="stat-emoji" aria-hidden="true">⭐</span><span class="stat-num">${p.stars}</span><span class="stat-label">모은 별</span></div>
         </div>
       </section>
@@ -313,6 +355,7 @@
         <ul>
           <li>형·언니는 <b>보통</b>, 동생은 <b>쉬움</b>으로 각자 대원 등록을 해 보세요. 나이에 맞는 이야기와 문제가 나와요.</li>
           <li><b>🔊 읽어 줘</b> 버튼을 누르면 이야기를 소리 내어 읽어 줘요. 글을 읽기 어려운 동생도 함께할 수 있어요.</li>
+          <li>시대 이야기 아래의 <b>‘그때 세계에서는?’</b> 상자를 보며 같은 때 우리나라와 세계에서 무슨 일이 있었는지 이야기해 보세요.</li>
           <li>퀴즈는 한 사람이 문제를 읽어 주고 다른 사람이 맞히는 방식으로 해 보세요.</li>
           <li>지갑 속 동전과 지폐에서 역사 인물과 문화유산을 찾아보세요. 10원·100원 동전, 만 원 지폐에 숨어 있어요!</li>
         </ul>
@@ -320,16 +363,19 @@
   }
 
   // ---------- 시대 탐험 (연표) ----------
-  function viewTimeline() {
+  function viewTimeline(arg) {
+    if (TRACKS[arg]) setTrack(arg);
+    const track = TRACKS[state.track];
     const p = me();
-    const next = ERAS.find(e => !p.stamps.includes(e.id));
+    const next = track.eras.find(e => !p.stamps.includes(e.id));
     $app.innerHTML = `
       <header class="page-head">
-        <h1>🗺️ 시대 탐험</h1>
+        <h1>${track.id === 'kr' ? '🗺️' : '🌍'} ${track.name} 탐험</h1>
+        ${trackSwitch(track.id, '#/timeline')}
         <p>정거장을 눌러 그 시대로 시간 여행을 떠나요. 이야기를 끝까지 읽으면 <b>탐험 도장</b>과 <b>카드</b>를 받아요!</p>
       </header>
       <ol class="road">
-        ${ERAS.map((e, i) => {
+        ${track.eras.map((e, i) => {
           const done = p.stamps.includes(e.id);
           const owned = cardsOfEra(e.id).filter(c => p.cards.includes(c.id)).length;
           const best = p.best[e.id];
@@ -354,16 +400,30 @@
   function viewEra(id) {
     const e = eraById[id];
     if (!e) { location.replace('#/timeline'); return; }
+    setTrack(e.track);
     eraState = { era: e, idx: 0 };
-    const i = ERAS.indexOf(e);
-    const nextEra = ERAS[i + 1];
+    const list = TRACKS[e.track].eras;
+    const nextEra = list[list.indexOf(e) + 1];
+    const compareTitle = e.track === 'kr' ? '🌍 그때 세계에서는?' : '🐯 그때 우리나라에서는?';
     $app.innerHTML = `
-      <a class="back" href="#/timeline">← 연표로 돌아가기</a>
+      <a class="back" href="#/timeline/${e.track}">← ${TRACKS[e.track].name} 연표로 돌아가기</a>
       <header class="era-banner" style="--era:${e.color}">
         <span class="era-emoji" aria-hidden="true">${e.emoji}</span>
-        <div><h1>${esc(e.name)}</h1><p>${esc(e.period)}</p></div>
+        <div><p class="era-track">${TRACKS[e.track].icon} ${TRACKS[e.track].name}</p><h1>${esc(e.name)}</h1><p>${esc(e.period)}</p></div>
       </header>
       <section id="story" class="story"></section>
+      <section class="panel compare ${e.track}">
+        <h2>${compareTitle}</h2>
+        <ul class="compare-list">
+          ${(e.compare || []).map(c => {
+            const other = eraById[c.era];
+            return `<li>
+              <span class="compare-emoji" aria-hidden="true">${c.emoji}</span>
+              <div><p>${esc(c.text)}</p><a class="chip chip-link" href="#/era/${other.id}" style="--era:${other.color}">${TRACKS[other.track].icon} ${esc(other.short)} 보러 가기 ›</a></div>
+            </li>`;
+          }).join('')}
+        </ul>
+      </section>
       <section class="panel">
         <h2>🔑 핵심 낱말</h2>
         <p class="hint">낱말 카드를 누르면 뜻이 나와요. 뜻을 먼저 맞혀 보세요!</p>
@@ -438,7 +498,7 @@
       return;
     }
     p.stamps.push(e.id);
-    const got = takeLocked(e.id, 1);
+    const got = takeLocked({ era: e.id }, 1);
     award(3, got);
     renderEraCards();
     sfx.win();
@@ -448,7 +508,7 @@
       <h2>탐험 도장 획득!</h2>
       <p>⭐ 별 3개${got.length ? '와 새 카드를' : '를'} 받았어요.</p>
       ${rewardCards(got)}
-      <div class="cta-row"><a class="btn btn-blue" href="#/quiz/${e.id}">❓ 퀴즈 도전</a><a class="btn btn-ghost" href="#/timeline">🗺️ 연표로</a></div>
+      <div class="cta-row"><a class="btn btn-blue" href="#/quiz/${e.id}">❓ 퀴즈 도전</a><a class="btn btn-ghost" href="#/timeline/${e.track}">🗺️ 연표로</a></div>
     </div>`, '탐험 도장 획득');
   }
 
@@ -456,29 +516,34 @@
   let quiz = null;
 
   function viewQuiz(arg) {
-    if (!arg) { viewQuizMenu(); return; }
-    if (arg !== 'mix' && !eraById[arg]) { location.replace('#/quiz'); return; }
-    quiz = { id: arg, qs: buildQuiz(arg), i: 0, score: 0, picked: null };
-    $app.innerHTML = `<a class="back" href="#/quiz">← 퀴즈 고르기</a><div id="quiz"></div>`;
+    if (!arg || TRACKS[arg]) { viewQuizMenu(arg); return; }
+    if (!MIX_IDS[arg] && !eraById[arg]) { location.replace('#/quiz'); return; }
+    const track = MIX_IDS[arg] || eraById[arg].track;
+    setTrack(track);
+    quiz = { id: arg, track, qs: buildQuiz(arg), i: 0, score: 0, picked: null };
+    $app.innerHTML = `<a class="back" href="#/quiz/${track}">← ${TRACKS[track].name} 퀴즈 고르기</a><div id="quiz"></div>`;
     renderQuestion();
   }
 
-  function viewQuizMenu() {
+  function viewQuizMenu(arg) {
+    if (TRACKS[arg]) setTrack(arg);
+    const track = TRACKS[state.track];
     const p = me();
     const lv = LEVELS[p.level];
-    const mixBest = p.best.mix;
+    const mixBest = p.best[track.mix];
     $app.innerHTML = `
       <header class="page-head quiz-menu-top">
-        <h1>❓ 역사 퀴즈</h1>
+        <h1>❓ ${track.name} 퀴즈</h1>
+        ${trackSwitch(track.id, '#/quiz')}
         <p>시대를 골라 ${QUIZ_LEN}문제에 도전해요. <b>3문제 이상</b> 맞히면 그 시대의 카드를 1장, <b>만점</b>이면 2장 받아요!</p>
         <p>지금 난이도: <b>${lv.icon} ${lv.name}</b> · <a href="#/players">난이도 바꾸기</a></p>
       </header>
-      <a class="mix-btn" href="#/quiz/mix">
+      <a class="mix-btn" href="#/quiz/${track.mix}">
         <span class="mix-emoji" aria-hidden="true">🎲</span>
-        <span><b>모든 시대 섞어서 ${MIX_LEN}문제!</b><small>7문제 이상 맞히면 아무 시대의 카드 1장, 만점이면 2장${mixBest != null ? ` · 최고 기록 ⭐ ${mixBest}/${MIX_LEN}` : ''}</small></span>
+        <span><b>${track.name} 모든 시대 섞어서 ${MIX_LEN}문제!</b><small>7문제 이상 맞히면 ${track.name} 카드 1장, 만점이면 2장${mixBest != null ? ` · 최고 기록 ⭐ ${mixBest}/${MIX_LEN}` : ''}</small></span>
       </a>
       <div class="era-grid">
-        ${ERAS.map(e => {
+        ${track.eras.map(e => {
           const best = p.best[e.id];
           return `<a class="era-tile" href="#/quiz/${e.id}" style="--era:${e.color}">
             <span class="era-tile-emoji" aria-hidden="true">${e.emoji}</span>
@@ -493,14 +558,14 @@
     const level = me().level;
     const allowed = q => level === 2 || q.level === 1;
     let qs;
-    if (id === 'mix') {
+    if (MIX_IDS[id]) {
       // 시대마다 한 문제씩 뽑고, 모자란 만큼 더 채워요
-      const perEra = ERAS.map(e => shuffle(QUESTIONS.filter(q => q.era === e.id && allowed(q))));
+      const perEra = TRACKS[MIX_IDS[id]].eras.map(e => shuffle(ALL_QUESTIONS.filter(q => q.era === e.id && allowed(q))));
       const firsts = perEra.map(list => list[0]).filter(Boolean);
       const rest = shuffle(perEra.flatMap(list => list.slice(1)));
-      qs = shuffle(firsts.concat(rest.slice(0, Math.max(0, MIX_LEN - firsts.length))));
+      qs = shuffle(firsts.concat(rest).slice(0, MIX_LEN));
     } else {
-      const pool = QUESTIONS.filter(q => q.era === id && allowed(q));
+      const pool = ALL_QUESTIONS.filter(q => q.era === id && allowed(q));
       if (level === 2) {
         const hard = shuffle(pool.filter(q => q.level === 2)).slice(0, 3);
         const easy = shuffle(pool.filter(q => q.level === 1)).slice(0, QUIZ_LEN - hard.length);
@@ -540,7 +605,7 @@
 
     box.innerHTML = `
       <div class="quiz-top">
-        <span class="chip" style="--era:${era.color}">${era.emoji} ${esc(era.short)}</span>
+        ${eraChip(era, false)}
         <span>${quiz.i + 1} / ${total}</span>
         <span>⭐ ${quiz.score}</span>
       </div>
@@ -595,14 +660,14 @@
 
   function finishQuiz() {
     const p = me();
-    const { id, score, qs } = quiz;
+    const { id, track, score, qs } = quiz;
     const total = qs.length;
-    const isMix = id === 'mix';
+    const isMix = !!MIX_IDS[id];
     if (p.best[id] == null || score > p.best[id]) p.best[id] = score;
 
     const pass = isMix ? 7 : 3;
     const want = score === total ? 2 : score >= pass ? 1 : 0;
-    const got = takeLocked(isMix ? null : id, want);
+    const got = takeLocked(isMix ? { track } : { era: id }, want);
     const bonus = (want - got.length) * 2; // 카드를 다 모았으면 대신 별을 더 줘요
     award(score + bonus, got);
 
@@ -626,7 +691,7 @@
         <div class="cta-row">
           <button class="btn btn-blue" type="button" data-action="retry-quiz">🔄 다시 도전</button>
           ${era ? `<a class="btn btn-green" href="#/era/${era.id}">📖 ${esc(era.short)} 이야기 보기</a>` : ''}
-          <a class="btn btn-ghost" href="#/quiz">다른 퀴즈 고르기</a>
+          <a class="btn btn-ghost" href="#/quiz/${track}">다른 퀴즈 고르기</a>
         </div>
       </section>`;
     window.scrollTo(0, 0);
@@ -635,69 +700,92 @@
   }
 
   // ---------- 카드 도감 ----------
-  function viewCards(filter) {
+  function viewCards(arg) {
+    let filter = 'all';
+    if (TRACKS[arg]) setTrack(arg);
+    else if (eraById[arg]) { setTrack(eraById[arg].track); filter = arg; }
+    const track = TRACKS[state.track];
     const p = me();
-    const current = eraById[filter] ? filter : 'all';
-    const list = current === 'all' ? CARDS : cardsOfEra(current);
-    const have = p.cards.length;
-    const tabs = [{ id: 'all', short: '전체', count: have, total: CARDS.length }].concat(ERAS.map(e => ({
-      id: e.id, short: e.short,
-      count: cardsOfEra(e.id).filter(c => p.cards.includes(c.id)).length,
-      total: cardsOfEra(e.id).length,
-    })));
+    const pool = cardsOfTrack(track.id);
+    const list = filter === 'all' ? pool : cardsOfEra(filter);
+    const owned = c => p.cards.includes(c.id);
+    const have = pool.filter(owned).length;
+    const tabs = [{ href: `#/cards/${track.id}`, on: filter === 'all', label: '전체', count: have, total: pool.length }]
+      .concat(track.eras.map(e => ({
+        href: `#/cards/${e.id}`, on: filter === e.id, label: e.short,
+        count: cardsOfEra(e.id).filter(owned).length, total: cardsOfEra(e.id).length,
+      })));
     $app.innerHTML = `
       <header class="page-head">
         <h1>🃏 카드 도감</h1>
+        ${trackSwitch(track.id, '#/cards')}
         <p>이야기를 끝까지 읽고 퀴즈를 풀면 카드가 모여요. 카드를 눌러 이야기를 읽어 보세요!</p>
       </header>
       <div class="meter">
-        <span>모은 카드 <b>${have}</b> / ${CARDS.length}${have === CARDS.length ? ' 🎉 모두 모았어요!' : ''}</span>
-        <div class="bar"><i style="width:${(have / CARDS.length) * 100}%"></i></div>
+        <span>${track.icon} ${track.name} 카드 <b>${have}</b> / ${pool.length}${have === pool.length ? ' 🎉 모두 모았어요!' : ''}</span>
+        <div class="bar"><i style="width:${(have / pool.length) * 100}%"></i></div>
+        <small class="hint">한국사·세계사 모두 합쳐 ${p.cards.length} / ${ALL_CARDS.length}장</small>
       </div>
       <nav class="filters" aria-label="시대별로 보기">
-        ${tabs.map(t => `<a class="filter ${t.id === current ? 'on' : ''}" href="#/cards/${t.id}" ${t.id === current ? 'aria-current="true"' : ''}>${esc(t.short)} <small>${t.count}/${t.total}</small></a>`).join('')}
+        ${tabs.map(t => `<a class="filter ${t.on ? 'on' : ''}" href="${t.href}" ${t.on ? 'aria-current="true"' : ''}>${esc(t.label)} <small>${t.count}/${t.total}</small></a>`).join('')}
       </nav>
-      <div class="card-grid">${list.map(c => cardTile(c, p.cards.includes(c.id))).join('')}</div>`;
+      <div class="card-grid">${list.map(c => cardTile(c, owned(c))).join('')}</div>`;
   }
 
   // ---------- 순서 맞추기 ----------
   let order = null;
 
-  function viewOrder() {
+  function viewOrder(arg) {
+    if (ORDER_MODES[arg] && state.orderMode !== arg) { state.orderMode = arg; save(); }
+    const mode = state.orderMode;
     $app.innerHTML = `
       <header class="page-head">
         <h1>🔢 순서 맞추기</h1>
-        <p>어떤 일이 먼저 일어났을까요? 아래 사건 카드를 <b>옛날 일부터</b> 차례대로 눌러 칸에 넣어요.</p>
+        <nav class="seg" aria-label="문제 종류 고르기">${Object.entries(ORDER_MODES).map(([id, m]) =>
+          `<a href="#/order/${id}" ${id === mode ? 'aria-current="page"' : ''}>${m.icon} ${m.name}</a>`).join('')}</nav>
+        <p>${ORDER_MODES[mode].note} 아래 사건 카드를 <b>옛날 일부터</b> 차례대로 눌러 칸에 넣어요.</p>
       </header>
       <div id="order"></div>`;
     newOrderRound();
   }
 
+  // ‘약’, ‘무렵’이 붙은 연도는 대략이라서, 너무 가까운 사건끼리는 함께 내지 않아요
+  const isApprox = ev => /약|무렵/.test(ev.when);
+  function separable(a, b, minGap) {
+    const gap = Math.abs(a.year - b.year);
+    if (gap < minGap) return false;
+    return isApprox(a) || isApprox(b) ? gap >= 50 : gap > 0;
+  }
+  function pickSeparated(pool, n, minGap) {
+    const picks = [];
+    for (const ev of shuffle(pool)) {
+      if (picks.every(p => separable(p, ev, minGap))) picks.push(ev);
+      if (picks.length === n) break;
+    }
+    return picks;
+  }
+
   function newOrderRound() {
     const level = me().level;
+    const mode = state.orderMode;
     const n = level === 1 ? 3 : 5;
+    const pool = mode === 'mix' ? ALL_EVENTS : ALL_EVENTS.filter(ev => trackOf(ev) === mode);
     let picks;
-    if (level === 1) {
+    if (level === 1 && mode !== 'mix') {
       // 쉬움: 서로 다른 시대에서 하나씩 (시대 이름표가 힌트가 돼요)
-      picks = shuffle(ERAS).slice(0, n).map(e => pick(EVENTS.filter(ev => ev.era === e.id)));
+      picks = shuffle(TRACKS[mode].eras).slice(0, n).map(e => pick(pool.filter(ev => ev.era === e.id)));
     } else {
-      // 보통: 같은 해에 일어난 사건은 함께 나오지 않게
-      picks = [];
-      const years = new Set();
-      for (const ev of shuffle(EVENTS)) {
-        if (years.has(ev.year)) continue;
-        picks.push(ev);
-        years.add(ev.year);
-        if (picks.length === n) break;
-      }
+      // 섞어서(쉬움)는 300년 이상 떨어진 사건끼리만 나와요
+      picks = pickSeparated(pool, n, level === 1 ? 300 : 0);
     }
-    order = { items: shuffle(picks), slots: Array(n).fill(null), checked: false, hint: level === 1, level, result: null };
+    order = { items: shuffle(picks), slots: Array(picks.length).fill(null), checked: false, hint: level === 1, level, mode, result: null };
     renderOrder();
   }
 
   function eventInner(ev) {
     const era = eraById[ev.era];
-    return `<span class="ev-emoji" aria-hidden="true">${ev.emoji}</span><span class="ev-label">${esc(ev.label)}</span>${order.hint ? `<span class="chip small" style="--era:${era.color}">${esc(era.short)}</span>` : ''}`;
+    return `<span class="ev-emoji" aria-hidden="true">${ev.emoji}</span><span class="ev-label">${esc(ev.label)}</span>${order.hint
+      ? `<span class="chip small" style="--era:${era.color}">${order.mode === 'mix' ? TRACKS[era.track].icon + ' ' : ''}${esc(era.short)}</span>` : ''}`;
   }
 
   function renderOrder() {
@@ -731,7 +819,7 @@
       bottom = `<section class="feedback ${ok === n ? 'good' : 'bad'}" role="status">
         <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${ok === n ? '완벽해! 시간 여행 박사구나!' : `${n}개 중 ${ok}개 맞았어! 바른 순서를 확인해 보자.`}</strong></div>
         ${ok < n ? `<ol class="answer-list">${sorted.map(ev => `<li><b>${esc(ev.when)}</b> ${esc(ev.label)}</li>`).join('')}</ol>` : ''}
-        <p>⭐ 별 ${ok + bonus}개를 받았어요.${ok === n && !got.length ? ' (카드를 모두 모아서 보너스 별!)' : ''}</p>
+        <p>⭐ 별 ${ok + bonus}개를 받았어요.${bonus ? ' (카드를 모두 모아서 보너스 별!)' : ''}</p>
         ${got.length ? `<h3>🎁 보너스 카드!</h3>${rewardCards(got)}` : ''}
       </section>
       <div class="cta-row"><button class="btn btn-green" type="button" data-action="order-new">🔄 새 문제</button></div>`;
@@ -775,7 +863,7 @@
     let got = [];
     let bonus = 0;
     if (ok === n) {
-      got = takeLocked(null, 1);
+      got = takeLocked({ track: order.mode === 'mix' ? null : order.mode }, 1);
       if (!got.length) bonus = 2;
       sfx.win();
       confetti();
@@ -805,7 +893,7 @@
         return `<li class="player ${on ? 'on' : ''}">
           <button class="player-main" type="button" data-action="choose" data-id="${p.id}">
             <span class="player-avatar" aria-hidden="true">${p.avatar}</span>
-            <span class="player-info"><b>${esc(p.name)}</b><small>${lv.icon} ${lv.name} · ⭐ ${p.stars} · 🃏 ${p.cards.length}/${CARDS.length} · 🎖️ ${p.stamps.length}/${ERAS.length}</small></span>
+            <span class="player-info"><b>${esc(p.name)}</b><small>${lv.icon} ${lv.name} · ⭐ ${p.stars} · 🃏 ${p.cards.length}/${ALL_CARDS.length} · 🎖️ ${p.stamps.length}/${ALL_ERAS.length}</small></span>
             ${on ? '<span class="now">지금 대원</span>' : ''}
           </button>
           <div class="player-tools">
@@ -864,7 +952,7 @@
     const speakEl = t.closest('[data-speak]');
     if (speakEl) { speak(speakEl.dataset.speak); return; }
 
-    // 지금 보고 있는 주소를 다시 누르면 화면을 새로 그려요 (예: 다시 도전)
+    // 지금 보고 있는 주소를 다시 누르면 화면을 새로 그려요 (예: 새 문제)
     const link = t.closest('a[href^="#/"]');
     if (link) {
       if (link.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
