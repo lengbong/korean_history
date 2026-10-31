@@ -8,6 +8,7 @@ NATION_IMAGES.push(
   { id: 'iraq-flood', file: 'img/nations/iraq-flood.jpg', caption: '『길가메시 서사시』 제11 점토판, 일명 ‘대홍수 점토판’ (니네베 출토, 기원전 7세기, 영국 대영 박물관)', author: 'BabelStone', license: 'CC0 (퍼블릭 도메인)', license_url: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:British_Museum_Flood_Tablet.jpg' },
   { id: 'iraq-hammurabi', file: 'img/nations/iraq-hammurabi.jpg', caption: '함무라비 법전 돌기둥 (기원전 18세기, 이란 수사 출토, 프랑스 파리 루브르 박물관)', author: 'Mbzt', license: 'CC BY 3.0', license_url: 'https://creativecommons.org/licenses/by/3.0', source: 'https://commons.wikimedia.org/wiki/File:P1050763_Louvre_code_Hammurabi_face_rwk.JPG' },
   { id: 'iraq-baghdad', file: 'img/nations/iraq-baghdad.jpg', caption: '도서관에 모인 학자들, 알하리리의 『마카마트』 사본 그림 (야흐야 알와시티 그림, 1237년 바그다드, 프랑스 국립 도서관)', author: 'Yahya ibn Mahmud al-Wasiti (1237)', license: '퍼블릭 도메인', license_url: '', source: 'https://commons.wikimedia.org/wiki/File:Maqamat_hariri.jpg' },
+  { id: 'egypt-pyramids', file: 'img/nations/egypt-pyramids.jpg', caption: '기자의 3대 피라미드 (이집트 기자, 기원전 26세기 무렵)', author: 'Ricardo Liberato', license: 'CC BY-SA 2.0', license_url: 'https://creativecommons.org/licenses/by-sa/2.0', source: 'https://commons.wikimedia.org/wiki/File:All_Gizah_Pyramids.jpg' },
   /*IMAGES*/
 );
 
