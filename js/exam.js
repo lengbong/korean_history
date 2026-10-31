@@ -21,3 +21,7 @@ const EXAM_QUESTIONS = [];
 const EXAM_PLUS = {};
 // 노트 사진과 출처: js/exam-images.js에서 채워요
 const EXAM_IMAGES = [];
+// 역사 사전: 개념 노트의 굵은 낱말을 누르면 열리는 상세 설명 (js/exam-dict*.js에서 채워요)
+// { id, term, unit, kind, when, aliases:[], summary, story, points:[], related:[], img:[], glossary?:[] }
+// aliases: 노트의 다른 표기(띄어쓰기·괄호 속 덧붙임은 자동 무시) / glossary: 용어 풀이에서 같은 이름의 다른 개념을 이 항목으로 이을 때
+const EXAM_DICT = [];
