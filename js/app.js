@@ -45,6 +45,10 @@
   const cardById = Object.fromEntries(ALL_CARDS.map(c => [c.id, c]));
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // 다른 파일(js/nations-view.js 등)이 화면 중간에 끼워 넣는 HTML
+  const hooks = {};
+  const hook = (name, ...args) => { try { return hooks[name] ? hooks[name](...args) : ''; } catch (e) { return ''; } };
+
   // ---------- 작은 도구 ----------
   const esc = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   const shuffle = arr => {
@@ -281,7 +285,7 @@
   }
 
   function setActiveTab(page) {
-    const tab = { era: 'timeline' }[page] || page;
+    const tab = { era: 'timeline', nations: 'timeline', nation: 'timeline', nstory: 'timeline', nquiz: 'quiz' }[page] || page;
     document.querySelectorAll('.tabs a').forEach(a => {
       if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
@@ -348,6 +352,7 @@
         ${tile('#/cards', '🃏', '카드 도감', '인물과 문화유산 카드를 모아요', '#8a5cc7')}
         ${tile('#/order', '🔢', '순서 맞추기', '무엇이 먼저 일어났을까?', '#e04848')}
       </nav>
+      ${hook('home')}
       ${p.level === 3 ? '' : examBanner}
       <section class="panel">
         <h2>🎒 ${esc(p.name)} 대원의 탐험 기록</h2>
@@ -386,6 +391,7 @@
         ${trackSwitch(track.id, '#/timeline')}
         <p>정거장을 눌러 그 시대로 시간 여행을 떠나요. 이야기를 끝까지 읽으면 <b>탐험 도장</b>과 <b>카드</b>를 받아요!</p>
       </header>
+      ${hook('timeline', track.id)}
       <ol class="road">
         ${track.eras.map((e, i) => {
           const done = p.stamps.includes(e.id);
@@ -563,7 +569,8 @@
             <span class="era-tile-best">${best != null ? `최고 ⭐ ${best}/${QUIZ_LEN}` : '아직 도전 전'}</span>
           </a>`;
         }).join('')}
-      </div>`;
+      </div>
+      ${hook('quizMenu', track.id)}`;
   }
 
   function buildQuiz(id) {
@@ -962,7 +969,10 @@
   const extraViews = {};
   window.HistoryApp = {
     registerView: (page, fn) => { extraViews[page] = fn; },
-    me, save, esc, shuffle, sfx, confetti, openModal, closeModal, focusHeading,
+    // 화면 중간에 다른 파일이 HTML을 끼워 넣는 자리 (home, timeline, quizMenu)
+    registerHook: (name, fn) => { hooks[name] = fn; },
+    me, save, esc, shuffle, pick, sfx, confetti, openModal, closeModal, focusHeading,
+    award, cardTile, rewardCards, speakBtn, stopSpeak, cardById, eraById,
   };
 
   // ---------- 이벤트 ----------
