@@ -302,7 +302,7 @@
       location.replace('#/players');
       return;
     }
-    const views = { home: viewHome, timeline: viewTimeline, era: viewEra, quiz: viewQuiz, cards: viewCards, order: viewOrder, players: viewPlayers };
+    const views = Object.assign({ home: viewHome, timeline: viewTimeline, era: viewEra, quiz: viewQuiz, cards: viewCards, order: viewOrder, players: viewPlayers }, extraViews);
     (views[page] || viewHome)(arg);
     renderHud();
     setActiveTab(page);
@@ -338,6 +338,11 @@
         ${tile('#/cards', '🃏', '카드 도감', '인물과 문화유산 카드를 모아요', '#8a5cc7')}
         ${tile('#/order', '🔢', '순서 맞추기', '무엇이 먼저 일어났을까?', '#e04848')}
       </nav>
+      <a class="exam-banner" href="#/exam">
+        <span class="exam-banner-icon" aria-hidden="true">🎓</span>
+        <span class="exam-banner-text"><b>한국사능력검정시험 심화 대비</b><small>중고생·어른용 · 개념 노트, 사료형 문제, 오답 노트, 실전 모의고사</small></span>
+        <span class="exam-banner-go" aria-hidden="true">›</span>
+      </a>
       <section class="panel">
         <h2>🎒 ${esc(p.name)} 대원의 탐험 기록</h2>
         <div class="stats">
@@ -946,6 +951,13 @@
     route();
   }
 
+  // ---------- 다른 파일(js/exam-view.js 등)이 화면을 덧붙일 수 있게 ----------
+  const extraViews = {};
+  window.HistoryApp = {
+    registerView: (page, fn) => { extraViews[page] = fn; },
+    me, save, esc, shuffle, sfx, confetti, openModal, closeModal, focusHeading,
+  };
+
   // ---------- 이벤트 ----------
   document.addEventListener('click', e => {
     const t = e.target;
@@ -1029,5 +1041,6 @@
 
   window.addEventListener('hashchange', route);
   if (canSpeak) try { speechSynthesis.getVoices(); } catch (e) { /* 목소리 목록 미리 불러오기 */ }
-  route();
+  // 뒤에 오는 스크립트가 화면을 등록할 수 있도록 문서를 다 읽은 뒤 첫 화면을 그려요
+  document.addEventListener('DOMContentLoaded', route);
 })();
