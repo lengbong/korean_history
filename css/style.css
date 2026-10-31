@@ -663,7 +663,7 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
 
 .exam .stat-num { font-size: 1.35rem; }
 .exam-actions { display: grid; gap: 12px; margin: 16px 0 6px; }
-@media (min-width: 720px) { .exam-actions { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .exam-actions { grid-template-columns: repeat(2, 1fr); } }
 .exam-big {
   display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; border-radius: var(--radius);
   color: #fff; text-decoration: none; font-family: var(--font-display); font-size: 1.3rem;
@@ -672,6 +672,7 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
 .exam-big.mock { background: linear-gradient(135deg, #1f3b73, #3c6fd1); box-shadow: 0 5px 0 #16294f; }
 .exam-big.wrongnote { background: linear-gradient(135deg, #a32c2c, #e04848); box-shadow: 0 5px 0 #7a1f1f; }
 .exam-big.mix { background: linear-gradient(135deg, #1f6f5c, #2a9a63); box-shadow: 0 5px 0 #165244; }
+.exam-big.flash { background: linear-gradient(135deg, #6a3fa0, #8a5cc7); box-shadow: 0 5px 0 #4b2c73; }
 .exam-big:active { transform: translateY(3px); }
 .exam-h2 { margin-top: 24px; }
 
@@ -770,3 +771,38 @@ body.no-player .tabs, body.no-player .hud-stat { display: none; }
 .review summary { cursor: pointer; font-family: var(--font-display); font-size: 1.02rem; }
 .review summary .hint { font-family: var(--font-body); margin-left: 6px; }
 .review .exam-q { box-shadow: none; }
+
+/* 암기 카드 */
+.flip-opt { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; cursor: pointer; }
+.flip-opt input { width: 20px; height: 20px; accent-color: var(--blue); }
+.deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.deck {
+  display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-radius: 16px; text-decoration: none; color: var(--ink);
+  background: var(--paper); border: 2px solid var(--line); border-left: 8px solid var(--era, var(--purple));
+}
+.deck:hover { border-color: var(--era, var(--purple)); }
+.deck b { font-family: var(--font-display); font-weight: 400; font-size: 1.12rem; }
+.deck small { color: var(--muted); }
+.deck-all { --era: var(--purple); }
+.deck-hard { --era: var(--red); background: var(--bad-bg); }
+.flash-card {
+  display: block; width: 100%; max-width: 560px; margin: 16px auto 12px; padding: 0;
+  border: 0; background: none; cursor: pointer; perspective: 1200px; text-align: center;
+}
+.flash-inner { display: grid; transition: transform 0.45s ease; transform-style: preserve-3d; }
+.flash-card.flipped .flash-inner { transform: rotateY(180deg); }
+.flash-face {
+  grid-area: 1 / 1; min-height: 230px; padding: 22px 20px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  border-radius: 24px; border: 3px solid var(--era); background: #fff; box-shadow: var(--shadow);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.flash-face.back { transform: rotateY(180deg); background: color-mix(in srgb, var(--era) 10%, white); }
+.flash-face small { color: var(--muted); font-family: var(--font-display); }
+.flash-face b { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.35rem, 5vw, 1.9rem); line-height: 1.45; color: var(--ink); }
+.flash-face em { font-style: normal; color: var(--muted); font-size: 0.9rem; }
+.flash-card:focus-visible { outline: none; }
+.flash-card:focus-visible .flash-face { outline: 3px solid var(--blue); outline-offset: 3px; }
+.flash-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.flash-keys { text-align: center; margin-top: 10px; }
+@media (hover: none) { .flash-keys { display: none; } }

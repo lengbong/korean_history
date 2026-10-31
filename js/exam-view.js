@@ -1,6 +1,7 @@
 /*
  * 범이의 역사 탐험대 — 한국사능력검정시험 심화 대비 화면
- * 주소: #/exam (학습 홈), #/exam/note/<단원>, #/exam/drill/<단원|mix|wrong>, #/exam/mock, #/exam/result
+ * 주소: #/exam (학습 홈), #/exam/note/<단원>, #/exam/drill/<단원|mix|wrong>, #/exam/mock, #/exam/result,
+ *       #/exam/flash (암기 카드 덱 고르기), #/exam/flash/<단원|all|hard>
  * 기록은 대원별로 player.exam 에 저장합니다.
  */
 (() => {
@@ -11,6 +12,9 @@
   const $app = document.getElementById('app');
   const unitById = Object.fromEntries(EXAM_UNITS.map(u => [u.id, u]));
   const qById = Object.fromEntries(EXAM_QUESTIONS.map(q => [q.id, q]));
+  // 암기 카드: 앞면 글자로 id를 만들어 카드 순서가 바뀌어도 기록이 이어지게 해요
+  const FLASH = EXAM_UNITS.flatMap(u => (EXAM_FLASH[u.id] || []).map(([f, b]) => ({ id: `${u.id}:${f}`, unit: u.id, f, b })));
+  const flashById = Object.fromEntries(FLASH.map(c => [c.id, c]));
   const MARKS = ['①', '②', '③', '④', '⑤'];
   const MIX_LEN = 20;
   const LIMIT = EXAM_INFO.minutes * 60;
@@ -64,6 +68,7 @@
     if (!Array.isArray(e.mocks)) e.mocks = [];
     if (e.mock === undefined) e.mock = null;
     if (e.last === undefined) e.last = null;
+    if (!e.flashHard) e.flashHard = {};
     return e;
   }
 
@@ -108,6 +113,8 @@
     else if (sub === 'drill' && (unitById[arg] || arg === 'mix' || arg === 'wrong')) viewDrill(arg);
     else if (sub === 'mock') viewMock();
     else if (sub === 'result' && data().last) viewResult();
+    else if (sub === 'flash' && !arg) viewFlashHub();
+    else if (sub === 'flash' && (unitById[arg] || arg === 'all' || arg === 'hard')) viewFlash(arg);
     else viewHub();
   });
 
@@ -140,6 +147,7 @@
           <a class="exam-big mock" href="#/exam/mock"><span>📝 실전 모의고사</span><small>${resume ? `풀던 시험 이어 풀기 · ${Object.keys(d.mock.ans).length}/${d.mock.qids.length}문항 답함` : `${EXAM_INFO.count}문항 · ${EXAM_INFO.minutes}분 · 단원별 출제 비율 반영`}</small></a>
           <a class="exam-big wrongnote" href="#/exam/drill/wrong"><span>❗ 오답 노트</span><small>${wrongN ? `${wrongN}문제 · 두 번 연속 맞히면 빠져요` : '틀린 문제가 자동으로 모여요'}</small></a>
           <a class="exam-big mix" href="#/exam/drill/mix"><span>🎲 전 단원 섞어 풀기</span><small>${MIX_LEN}문제 · 정답과 해설을 바로 확인</small></a>
+          <a class="exam-big flash" href="#/exam/flash"><span>🗂️ 빈출 연도·키워드 암기 카드</span><small>${FLASH.length}장 · 헷갈리는 카드 ${hardCount()}장</small></a>
         </div>
         <h2 class="exam-h2">단원별 학습</h2>
         <ol class="unit-list">
@@ -154,6 +162,7 @@
               <div class="unit-btns">
                 <a class="mini" href="#/exam/note/${u.id}">📘 개념 노트</a>
                 <a class="mini" href="#/exam/drill/${u.id}">✏️ 문제 풀기</a>
+                <a class="mini" href="#/exam/flash/${u.id}">🗂️ 암기 카드</a>
               </div>
             </li>`;
           }).join('')}
@@ -177,6 +186,7 @@
         </header>
         <div class="row-gap note-tools">
           <a class="btn btn-blue" href="#/exam/drill/${u.id}">✏️ 이 단원 문제 풀기 (${unitQs(u.id).length})</a>
+          <a class="btn btn-ghost" href="#/exam/flash/${u.id}">🗂️ 암기 카드</a>
           ${u.era ? `<a class="btn btn-ghost" href="#/era/${u.era}">🐯 아이용 이야기로 먼저 보기</a>` : ''}
         </div>
         ${u.sections.map(s => `
@@ -496,7 +506,141 @@
       </div>`;
   }
 
+  // ---------- 빈출 연도·키워드 암기 카드 ----------
+  const hardCount = () => Object.keys(data().flashHard).filter(id => flashById[id]).length;
+  let flash = null;
+
+  function viewFlashHub() {
+    const d = data();
+    const hard = d.flashHard;
+    $app.innerHTML = `
+      <div class="exam">
+        <a class="back" href="#/exam">← 심화 학습 홈</a>
+        <header class="page-head">
+          <h1>🗂️ 빈출 연도·키워드 암기 카드</h1>
+          <p>앞면을 보고 답을 떠올린 뒤 카드를 뒤집어 확인해요. <b>다시 볼래요</b>를 누른 카드는 ‘헷갈리는 카드’에 모이고, <b>알아요</b>를 누르면 빠져요.</p>
+        </header>
+        <label class="flip-opt"><input type="checkbox" data-exam-rev ${d.flashRev ? 'checked' : ''}> 뒷면(설명)을 먼저 보고 연도·키워드 떠올리기</label>
+        <div class="deck-grid">
+          <a class="deck deck-all" href="#/exam/flash/all"><b>🎲 전체 섞기</b><small>${FLASH.length}장</small></a>
+          <a class="deck deck-hard" href="#/exam/flash/hard"><b>🤔 헷갈리는 카드</b><small>${hardCount()}장</small></a>
+          ${EXAM_UNITS.map((u, i) => {
+            const cards = FLASH.filter(c => c.unit === u.id);
+            const h = cards.filter(c => hard[c.id]).length;
+            return `<a class="deck" href="#/exam/flash/${u.id}" style="--era:${u.color}"><b>${i + 1}. ${esc(u.short)}</b><small>${cards.length}장${h ? ` · 헷갈림 ${h}` : ''}</small></a>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  function viewFlash(key) {
+    const d = data();
+    let cards;
+    if (key === 'all') cards = FLASH;
+    else if (key === 'hard') cards = FLASH.filter(c => d.flashHard[c.id]);
+    else cards = FLASH.filter(c => c.unit === key);
+    const title = key === 'all' ? '🎲 전체 섞기' : key === 'hard' ? '🤔 헷갈리는 카드' : `🗂️ ${unitById[key].short}`;
+    if (!cards.length) {
+      $app.innerHTML = `
+        <div class="exam">
+          <a class="back" href="#/exam/flash">← 덱 고르기</a>
+          <section class="panel result">
+            <div class="big-emoji" aria-hidden="true">🎉</div>
+            <h1>${title}</h1>
+            <p>헷갈리는 카드가 없어요. 카드를 보다가 <b>다시 볼래요</b>를 누르면 여기에 모여요.</p>
+            <div class="cta-row"><a class="btn btn-blue" href="#/exam/flash/all">🎲 전체 섞기</a></div>
+          </section>
+        </div>`;
+      return;
+    }
+    flash = { key, title, queue: A.shuffle(cards.map(c => c.id)), pos: 0, flipped: false, known: 0, again: 0, total: cards.length, rev: !!d.flashRev };
+    $app.innerHTML = `<div class="exam"><a class="back" href="#/exam/flash">← 덱 고르기</a><div id="flash"></div></div>`;
+    renderFlash();
+  }
+
+  function renderFlash() {
+    const box = document.getElementById('flash');
+    if (flash.pos >= flash.queue.length) { finishFlash(box); return; }
+    const c = flashById[flash.queue[flash.pos]];
+    const u = unitById[c.unit];
+    const [front, back] = flash.rev ? [c.b, c.f] : [c.f, c.b];
+    const left = flash.queue.length - flash.pos;
+    box.innerHTML = `
+      <div class="quiz-top"><span>${flash.title}</span><span>남은 카드 ${left}</span><span>🤔 ${hardCount()}</span></div>
+      <div class="bar" role="progressbar" aria-label="진행" aria-valuemin="0" aria-valuemax="${flash.total}" aria-valuenow="${flash.known}"><i style="width:${(flash.known / flash.total) * 100}%"></i></div>
+      <h1 class="visually-hidden">${flash.title} 암기 카드</h1>
+      <button type="button" class="flash-card" data-exam="flash-flip" style="--era:${u.color}" aria-label="카드 뒤집기">
+        <span class="flash-inner">
+          <span class="flash-face front"><small>${esc(u.short)}</small><b>${esc(front)}</b><em>눌러서 뒤집기</em></span>
+          <span class="flash-face back" aria-hidden="true"><small>${flash.rev ? '연도·키워드' : '정답'}</small><b>${esc(back)}</b></span>
+        </span>
+      </button>
+      <div class="flash-btns" id="flash-btns">${flashButtons()}</div>
+      <p class="hint flash-keys">키보드: 스페이스 = 뒤집기 · 1 = 다시 볼래요 · 2 = 알아요</p>`;
+  }
+
+  const flashButtons = () => flash.flipped
+    ? `<button class="btn btn-red" type="button" data-exam="flash-again">🤔 다시 볼래요</button>
+       <button class="btn btn-green" type="button" data-exam="flash-know">😊 알아요</button>`
+    : '<button class="btn btn-blue" type="button" data-exam="flash-flip">🔄 뒤집어 확인하기</button>';
+
+  function flipFlash() {
+    const card = document.querySelector('#flash .flash-card');
+    if (!card) return;
+    flash.flipped = !flash.flipped;
+    card.classList.toggle('flipped', flash.flipped);
+    card.querySelector('.front').setAttribute('aria-hidden', String(flash.flipped));
+    card.querySelector('.back').setAttribute('aria-hidden', String(!flash.flipped));
+    document.getElementById('flash-btns').innerHTML = flashButtons();
+    A.sfx.tap();
+    card.focus({ preventScroll: true });
+  }
+
+  function answerFlash(known) {
+    if (!flash || !flash.flipped) return;
+    const id = flash.queue[flash.pos];
+    const hard = data().flashHard;
+    if (known) {
+      flash.known++;
+      delete hard[id];
+      A.sfx.good();
+    } else {
+      // 헷갈리는 카드에 넣고, 이번 학습의 맨 뒤에 한 번 더 보여 줘요
+      flash.again++;
+      hard[id] = true;
+      flash.queue.push(id);
+      A.sfx.tap();
+    }
+    A.save();
+    flash.pos++;
+    flash.flipped = false;
+    renderFlash();
+    const card = document.querySelector('#flash .flash-card');
+    if (card) card.focus({ preventScroll: true });
+  }
+
+  function finishFlash(box) {
+    const h = hardCount();
+    if (!flash.again) { A.sfx.win(); A.confetti(40); }
+    box.innerHTML = `
+      <section class="panel result">
+        <div class="big-emoji" aria-hidden="true">${flash.again ? '💪' : '🏆'}</div>
+        <h1 class="result-score">${flash.total}장을 모두 외웠어요!</h1>
+        <p>${flash.again ? `‘다시 볼래요’를 ${flash.again}번 눌렀어요. 헷갈리는 카드는 모두 ${h}장이에요.` : '한 번에 모두 알았어요. 대단해요!'}</p>
+        <div class="cta-row">
+          ${h ? '<a class="btn btn-red" href="#/exam/flash/hard">🤔 헷갈리는 카드 복습</a>' : ''}
+          <a class="btn btn-blue" href="#/exam/flash/${flash.key}">🔄 다시 하기</a>
+          <a class="btn btn-ghost" href="#/exam/flash">덱 고르기</a>
+        </div>
+      </section>`;
+    rerender();
+  }
+
   // ---------- 이벤트 ----------
+  document.addEventListener('change', e => {
+    if (e.target.matches('[data-exam-rev]')) { data().flashRev = e.target.checked; A.save(); }
+  });
+
   document.addEventListener('click', e => {
     const pick = e.target.closest('[data-exam-pick]');
     if (pick && !pick.disabled && !pick.closest('details')) {
@@ -515,13 +659,23 @@
       case 'mock-prev': goMock(data().mock.cur - 1); break;
       case 'mock-next': goMock(data().mock.cur + 1); break;
       case 'mock-submit': submitMock(false); break;
+      case 'flash-flip': flipFlash(); break;
+      case 'flash-know': answerFlash(true); break;
+      case 'flash-again': answerFlash(false); break;
     }
   });
 
-  // 숫자 키 1~5로 답 고르기
+  // 숫자 키 1~5로 답 고르기 · 암기 카드는 스페이스(뒤집기)와 1·2
   document.addEventListener('keydown', e => {
-    if (e.altKey || e.ctrlKey || e.metaKey || !/^[1-5]$/.test(e.key)) return;
-    if (document.getElementById('modal') || /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (document.getElementById('modal') || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+    if (location.hash.startsWith('#/exam/flash/') && flash && document.querySelector('#flash .flash-card')) {
+      if (e.key === ' ' && document.activeElement.tagName !== 'BUTTON') { e.preventDefault(); flipFlash(); }
+      else if (flash.flipped && e.key === '1') answerFlash(false);
+      else if (flash.flipped && e.key === '2') answerFlash(true);
+      return;
+    }
+    if (!/^[1-5]$/.test(e.key)) return;
     const k = Number(e.key) - 1;
     if (location.hash.startsWith('#/exam/mock') && data().mock) pickMock(k);
     else if (location.hash.startsWith('#/exam/drill') && drill && document.getElementById('drill') && drill.picked === null) pickDrill(k);

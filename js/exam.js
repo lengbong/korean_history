@@ -12,7 +12,7 @@ const EXAM_INFO = {
   point: 2,
   grades: [[80, '1급'], [70, '2급'], [60, '3급']],
   // 모의고사 단원별 출제 문항 수 (합계 50)
-  weights: { pre: 3, three: 5, nambuk: 4, goryeo: 8, joseon1: 6, joseon2: 7, modern: 7, japan: 5, korea: 4, topic: 1 },
+  weights: { pre: 3, three: 5, nambuk: 4, goryeo: 7, joseon1: 6, joseon2: 7, modern: 7, japan: 5, korea: 4, topic: 2 },
 };
 
 const EXAM_UNITS = [];
