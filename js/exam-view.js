@@ -198,7 +198,7 @@
     const tips = p.tips && p.tips.length
       ? `<div class="note-tip"><p class="note-label">💡 시험 포인트·함정</p><ul>${p.tips.map(t => `<li>${fmtTerms(t, unit)}</li>`).join('')}</ul></div>` : '';
     const terms = p.terms && p.terms.length
-      ? `<details class="note-terms"><summary>🔤 용어 풀이 (${p.terms.length})</summary><dl>${p.terms.map(([w, m]) => `<div><dt>${findEntry(w, unit) ? termBtn(w, unit) : esc(w)}</dt><dd>${esc(m)}</dd></div>`).join('')}</dl></details>` : '';
+      ? `<details class="note-terms"><summary>🔤 용어 풀이 (${p.terms.length})</summary><dl>${p.terms.map(([w, m]) => `<div><dt>${glossTerm(w, unit)}</dt><dd>${esc(m)}</dd></div>`).join('')}</dl></details>` : '';
     return { story, extra: tips + terms };
   }
 
@@ -313,6 +313,9 @@
     const list = dictIndex.get(normKey(text));
     return list ? list.find(e => e.unit === unit) || list[0] : null;
   }
+  // 용어 풀이의 낱말이 같은 이름의 다른 개념일 때: 항목의 glossary 목록으로 바로 이어요 (예: 고려 ‘서경’ → 서경권)
+  const glossLink = new Map();
+  EXAM_DICT.forEach(e => (e.glossary || []).forEach(w => glossLink.set(normKey(w), e)));
   // 용어 풀이(js/exam-plus*.js의 terms)
   const glossIndex = new Map();
   Object.entries(EXAM_PLUS).forEach(([unit, p]) => Object.values(p.sections || {}).concat(Object.values(p.tables || {}))
@@ -363,6 +366,11 @@
     }
     linkCache.set(ck, st);
     return st;
+  }
+  function glossTerm(w, unit) {
+    const e = glossLink.get(normKey(w));
+    if (e) return `<button type="button" class="term full" data-term-id="${esc(e.id)}">${esc(w)}</button>`;
+    return findEntry(w, unit) ? termBtn(w, unit) : esc(w);
   }
   const termBtn = (text, unit) =>
     `<button type="button" class="term ${linkState(text, unit) === 'full' ? 'full' : ''}" data-term="${esc(text)}" data-term-unit="${esc(unit)}">${esc(text)}</button>`;
