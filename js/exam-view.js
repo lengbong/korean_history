@@ -282,7 +282,7 @@
     const plus = EXAM_PLUS[u.id];
     if (!plus) return '';
     const used = Object.values(plus.sections || {}).flatMap(p => p.img || []).filter(id => imgById[id]);
-    return used.length ? '<p class="hint note-credit">사진은 위키미디어 공용(Wikimedia Commons)에서 자유 이용이 허락된 것만 골라 실었어요. 각 사진 아래에 지은이와 라이선스를 적었어요.</p>' : '';
+    return used.length ? '<p class="hint note-credit">사진은 위키미디어 공용(Wikimedia Commons)에서 자유 이용이 허락된 것만 골라 화면에 맞게 크기를 줄여 실었어요. 각 사진 아래에 지은이와 라이선스, 원본 링크를 적었어요.</p>' : '';
   }
 
   function zoomImage(id) {
