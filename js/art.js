@@ -1,0 +1,178 @@
+/*
+ * 문화유산 카드 그림 (SVG)
+ * 이모지로 표현하기 어려운 유물을 간단한 그림으로 그립니다.
+ */
+
+const ART = (() => {
+  const svg = (body, viewBox = '0 0 120 120') =>
+    `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">${body}</svg>`;
+
+  const range = n => Array.from({ length: n }, (_, i) => i);
+
+  // 빗살무늬: 줄마다 방향이 바뀌는 짧은 빗금
+  const bitsalLines = range(4).map(row => {
+    const y = 32 + row * 13;
+    const half = 27 - row * 5;
+    const dir = row % 2 ? -1 : 1;
+    return range(Math.floor(half / 4) + 1).map(i => {
+      const x = 60 - half + i * 8;
+      return `<line x1="${x}" y1="${y}" x2="${x + 5 * dir}" y2="${y + 7}"/>`;
+    }).join('');
+  }).join('');
+
+  // 첨성대: 아래가 넓고 위로 갈수록 좁아지는 돌 단
+  const cheomCourses = range(11).map(i => {
+    const y = 92 - i * 6.4;
+    const w = 26 + 22 * Math.pow(1 - i / 10, 1.8);
+    return `<rect x="${(60 - w / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="6.4" rx="1.5"/>`;
+  }).join('');
+
+  // 팔만대장경판의 글자
+  const blockChars = range(11).map(c => range(6).map(r =>
+    `<rect x="${24 + c * 6.6}" y="${40 + r * 7.2}" width="4" height="4.4" rx="1"/>`).join('')).join('');
+
+  // 거북선 등의 쇠못
+  const spikes = range(9).map(i => {
+    const t = (i + 1) / 10;
+    const x = 26 + t * 68;
+    const y = 70 - Math.sin(Math.PI * t) * 23;
+    return `<path d="M${(x - 2.5).toFixed(1)} ${(y + 1).toFixed(1)} L${x.toFixed(1)} ${(y - 6).toFixed(1)} L${(x + 2.5).toFixed(1)} ${(y + 1).toFixed(1)}Z"/>`;
+  }).join('');
+
+  // 태극기 괘 (막대 길이 20, 두께 10/3, 간격 5/3)
+  const bar = (y, broken) => broken
+    ? `<rect x="-10" y="${y}" width="9.17" height="3.33"/><rect x="0.83" y="${y}" width="9.17" height="3.33"/>`
+    : `<rect x="-10" y="${y}" width="20" height="3.33"/>`;
+  const trigram = (dist, lines) => lines.map((broken, i) => bar(-(dist - 5 + i * 5) - 1.67, broken)).join('');
+  const D = 36.67;
+
+  return {
+    jumeok: svg(`
+      <ellipse cx="60" cy="108" rx="34" ry="5" fill="#000" opacity=".08"/>
+      <path d="M60 10 C77 30 92 62 88 88 C85 103 73 110 60 110 C47 110 35 103 32 88 C28 62 43 30 60 10Z" fill="#b08968" stroke="#6b4f3a" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M60 20 L50 50 L60 68 L71 47Z" fill="#c9a27e"/>
+      <path d="M41 70 L60 68 L51 95Z" fill="#9c7556"/>
+      <path d="M60 68 L80 73 L69 99Z" fill="#a98063"/>
+      <path d="M60 20 L50 50 L60 68 L71 47Z M41 70 L60 68 L80 73" fill="none" stroke="#6b4f3a" stroke-width="1.5" opacity=".6"/>`),
+
+    bitsal: svg(`
+      <ellipse cx="60" cy="110" rx="18" ry="4" fill="#000" opacity=".08"/>
+      <path d="M28 22 H92 C94 52 82 88 60 108 C38 88 26 52 28 22Z" fill="#c98b5a" stroke="#7a4b2a" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="60" cy="22" rx="32" ry="5" fill="#a86c3f" stroke="#7a4b2a" stroke-width="3"/>
+      <g stroke="#7a4b2a" stroke-width="2.4" stroke-linecap="round">${bitsalLines}</g>`),
+
+    goindol: svg(`
+      <rect x="6" y="100" width="108" height="10" rx="5" fill="#8bc34a"/>
+      <path d="M33 58 H47 L49 102 H31Z" fill="#9e9e9e" stroke="#555" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M73 58 H87 L89 102 H71Z" fill="#8f8f8f" stroke="#555" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M10 52 C16 36 98 30 112 44 C115 55 102 62 60 63 C22 63 8 60 10 52Z" fill="#b5b5b5" stroke="#555" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M26 46 C44 40 78 39 96 42" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".45"/>`),
+
+    bipa: svg(`
+      <path d="M60 8 C66 24 69 38 67 50 C74 58 77 72 71 84 L65 92 H55 L49 84 C43 72 46 58 53 50 C51 38 54 24 60 8Z" fill="#c8a24c" stroke="#6b5520" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M53 50 C56 52 64 52 67 50" fill="none" stroke="#6b5520" stroke-width="2"/>
+      <line x1="60" y1="16" x2="60" y2="90" stroke="#6b5520" stroke-width="3"/>
+      <rect x="44" y="90" width="32" height="7" rx="3.5" fill="#8d6e63" stroke="#4e342e" stroke-width="2"/>
+      <rect x="54" y="97" width="12" height="18" rx="3" fill="#5d4037"/>
+      <path d="M62 22 C64 32 65 40 64 48" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/>`),
+
+    cheomseongdae: svg(`
+      <rect x="22" y="104" width="76" height="8" rx="2" fill="#a1887f"/>
+      <rect x="28" y="98" width="64" height="7" rx="2" fill="#bcaaa4"/>
+      <g fill="#dccaa8" stroke="#8a7656" stroke-width="1.6">${cheomCourses}</g>
+      <rect x="54" y="56" width="12" height="13" rx="1" fill="#4e342e"/>
+      <rect x="44" y="20" width="32" height="7" fill="#c9b591" stroke="#8a7656" stroke-width="2"/>
+      <rect x="47" y="14" width="26" height="6" fill="#d8c6a2" stroke="#8a7656" stroke-width="2"/>
+      <circle cx="94" cy="20" r="3" fill="#f7b733"/><circle cx="102" cy="34" r="2" fill="#f7b733"/><circle cx="20" cy="28" r="2.5" fill="#f7b733"/>`),
+
+    dabotap: svg(`
+      <rect x="16" y="100" width="88" height="10" rx="2" fill="#bdb5a8" stroke="#7d756a" stroke-width="2"/>
+      <rect x="50" y="94" width="20" height="6" fill="#cfc8bb" stroke="#7d756a" stroke-width="1.5"/>
+      <rect x="28" y="72" width="64" height="22" fill="#e3ddd2" stroke="#7d756a" stroke-width="2"/>
+      <g fill="#bdb5a8"><rect x="32" y="72" width="6" height="22"/><rect x="82" y="72" width="6" height="22"/><rect x="57" y="72" width="6" height="22"/></g>
+      <rect x="22" y="66" width="76" height="7" rx="1.5" fill="#cfc8bb" stroke="#7d756a" stroke-width="2"/>
+      <rect x="38" y="54" width="44" height="12" fill="#e3ddd2" stroke="#7d756a" stroke-width="2"/>
+      <g stroke="#7d756a" stroke-width="1.5">${range(7).map(i => `<line x1="${42 + i * 6}" y1="56" x2="${42 + i * 6}" y2="64"/>`).join('')}</g>
+      <rect x="34" y="50" width="52" height="5" rx="1.5" fill="#cfc8bb" stroke="#7d756a" stroke-width="2"/>
+      <rect x="46" y="38" width="28" height="12" fill="#e3ddd2" stroke="#7d756a" stroke-width="2"/>
+      <ellipse cx="60" cy="36" rx="18" ry="4.5" fill="#cfc8bb" stroke="#7d756a" stroke-width="2"/>
+      <rect x="52" y="22" width="16" height="12" fill="#e3ddd2" stroke="#7d756a" stroke-width="2"/>
+      <path d="M44 22 L60 15 L76 22Z" fill="#cfc8bb" stroke="#7d756a" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="60" y1="4" x2="60" y2="15" stroke="#7d756a" stroke-width="3"/>
+      <circle cx="60" cy="8" r="3" fill="#cfc8bb" stroke="#7d756a" stroke-width="1.5"/>`),
+
+    celadon: svg(`
+      <ellipse cx="60" cy="110" rx="18" ry="4" fill="#000" opacity=".08"/>
+      <path d="M52 12 H68 V19 C88 23 97 40 93 60 C89 82 78 96 74 108 H46 C42 96 31 82 27 60 C23 40 32 23 52 19Z" fill="#8cc7b5" stroke="#3f7f6f" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="60" cy="12" rx="9" ry="3" fill="#6fb09d" stroke="#3f7f6f" stroke-width="2"/>
+      <g fill="none" stroke="#fff" stroke-width="2">
+        <circle cx="45" cy="52" r="10"/><circle cx="76" cy="66" r="10"/>
+      </g>
+      <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+        <path d="M40 54 L45 49 L50 54 M45 49 L45 46"/>
+        <path d="M71 68 L76 63 L81 68 M76 63 L76 60"/>
+        <path d="M64 40 c3 -4 7 -4 9 0 c2 -3 6 -2 6 1"/>
+        <path d="M40 80 c3 -4 7 -4 9 0 c2 -3 6 -2 6 1"/>
+      </g>
+      <g fill="#7a3b2e"><circle cx="45" cy="51" r="1.2"/><circle cx="76" cy="65" r="1.2"/></g>`),
+
+    tripitaka: svg(`
+      <ellipse cx="60" cy="102" rx="46" ry="5" fill="#000" opacity=".08"/>
+      <rect x="16" y="30" width="88" height="62" rx="3" fill="#b07d4f" stroke="#5d4037" stroke-width="3"/>
+      <rect x="8" y="26" width="11" height="70" rx="3" fill="#6d4c41" stroke="#3e2723" stroke-width="2"/>
+      <rect x="101" y="26" width="11" height="70" rx="3" fill="#6d4c41" stroke="#3e2723" stroke-width="2"/>
+      <g fill="#4e342e" opacity=".8">${blockChars}</g>
+      <path d="M22 36 H98" stroke="#d9a877" stroke-width="2" opacity=".6"/>`),
+
+    hunminjeongeum: svg(`
+      <path d="M60 28 C46 20 26 20 10 24 V96 C26 92 46 92 60 100Z" fill="#fff8e1" stroke="#8d6e63" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M60 28 C74 20 94 20 110 24 V96 C94 92 74 92 60 100Z" fill="#fffdf4" stroke="#8d6e63" stroke-width="3" stroke-linejoin="round"/>
+      <line x1="60" y1="28" x2="60" y2="100" stroke="#8d6e63" stroke-width="2"/>
+      <g font-family="Jua, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif" text-anchor="middle" fill="#3a2e27">
+        <text x="35" y="56" font-size="20">ㄱ ㄴ</text>
+        <text x="35" y="82" font-size="20">ㄷ ㄹ</text>
+        <text x="85" y="56" font-size="20">ㅏ ㅑ</text>
+        <text x="85" y="82" font-size="20">ㅓ ㅕ</text>
+      </g>
+      <rect x="40" y="6" width="40" height="14" rx="4" fill="#e04848"/>
+      <text x="60" y="17" font-size="10" text-anchor="middle" fill="#fff" font-family="Jua, sans-serif">훈민정음</text>`),
+
+    geobukseon: svg(`
+      <path d="M4 98 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0" fill="none" stroke="#2f6fd0" stroke-width="3" stroke-linecap="round"/>
+      <g stroke="#5d4037" stroke-width="2.5" stroke-linecap="round">
+        ${range(6).map(i => `<line x1="${32 + i * 11}" y1="84" x2="${26 + i * 11}" y2="97"/>`).join('')}
+      </g>
+      <path d="M12 70 H106 L96 88 H22Z" fill="#8d5a3b" stroke="#4e342e" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M22 70 C30 40 90 40 98 70Z" fill="#6d8b5a" stroke="#3e5232" stroke-width="3" stroke-linejoin="round"/>
+      <g fill="none" stroke="#3e5232" stroke-width="1.5" opacity=".7">
+        <path d="M40 66 l6 -8 h10 l6 8 M58 58 l6 -8 h10 l6 8"/>
+      </g>
+      <g fill="#cfd8dc" stroke="#455a64" stroke-width="1">${spikes}</g>
+      <path d="M96 66 C100 52 112 50 116 57 L109 62 L115 66 L100 72Z" fill="#c0392b" stroke="#7b1f16" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="108" cy="56" r="1.8" fill="#fff"/>
+      <path d="M14 70 L8 54 L18 64" fill="#c0392b" stroke="#7b1f16" stroke-width="2" stroke-linejoin="round"/>`),
+
+    taegukgi: svg(`
+      <rect x="1" y="21" width="118" height="78" fill="#fff" stroke="#d6d0c4" stroke-width="2"/>
+      <g transform="translate(60 60)">
+        <circle r="20" fill="#0047a0"/>
+        <path d="M-16.64 -11.09 A20 20 0 0 1 16.64 11.09 A10 10 0 0 0 0 0 A10 10 0 0 1 -16.64 -11.09Z" fill="#cd2e3a"/>
+        <g fill="#000">
+          <g transform="rotate(-56.31)">${trigram(D, [false, false, false])}<g transform="rotate(180)">${trigram(D, [true, true, true])}</g></g>
+          <g transform="rotate(56.31)">${trigram(D, [true, false, true])}<g transform="rotate(180)">${trigram(D, [false, true, false])}</g></g>
+        </g>
+      </g>`),
+
+    dongnimmun: svg(`
+      <rect x="6" y="106" width="108" height="6" rx="3" fill="#c5b9a5"/>
+      <rect x="22" y="34" width="76" height="72" fill="#e6e1d6" stroke="#7d756a" stroke-width="3"/>
+      <g stroke="#b9b1a3" stroke-width="1.2">
+        ${range(8).map(i => `<line x1="22" y1="${42 + i * 8}" x2="98" y2="${42 + i * 8}"/>`).join('')}
+      </g>
+      <path d="M44 106 V72 A16 16 0 0 1 76 72 V106Z" fill="#5d554a" stroke="#7d756a" stroke-width="3"/>
+      <rect x="16" y="24" width="88" height="11" rx="1.5" fill="#d3ccbe" stroke="#7d756a" stroke-width="3"/>
+      <rect x="40" y="16" width="40" height="9" fill="#d3ccbe" stroke="#7d756a" stroke-width="2.5"/>
+      <rect x="44" y="40" width="32" height="12" fill="#fff" stroke="#7d756a" stroke-width="2"/>
+      <text x="60" y="49.5" font-size="8.5" text-anchor="middle" fill="#3a2e27" font-family="Jua, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">독립문</text>`),
+  };
+})();

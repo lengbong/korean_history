@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>범이의 한국사 탐험대</title>
+  <meta name="description" content="아이들과 가족이 함께 즐기는 한국사 학습 놀이터. 시대 탐험, 역사 퀴즈, 인물 카드 수집, 순서 맞추기 게임!">
+  <meta name="theme-color" content="#fff6e6">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐯</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="saekdong" aria-hidden="true"></div>
+    <div class="topbar-inner">
+      <a class="logo" href="#/home" aria-label="범이의 한국사 탐험대 처음 화면">
+        <span class="logo-icon" aria-hidden="true">🐯</span>
+        <span><span class="logo-long">범이의 </span><b>한국사 탐험대</b></span>
+      </a>
+      <div class="hud" id="hud"></div>
+    </div>
+    <nav class="tabs" aria-label="주요 메뉴">
+      <div class="tabs-inner">
+        <a href="#/home" data-tab="home"><span aria-hidden="true">🏠</span>홈</a>
+        <a href="#/timeline" data-tab="timeline"><span aria-hidden="true">🗺️</span>탐험</a>
+        <a href="#/quiz" data-tab="quiz"><span aria-hidden="true">❓</span>퀴즈</a>
+        <a href="#/cards" data-tab="cards"><span aria-hidden="true">🃏</span>카드</a>
+        <a href="#/order" data-tab="order"><span aria-hidden="true">🔢</span>순서</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="app" class="app" tabindex="-1">
+    <noscript><p class="panel">이 사이트는 자바스크립트가 켜져 있어야 동작해요.</p></noscript>
+  </main>
+
+  <footer class="footer">
+    역사 내용은 초등학교 사회 교과 수준으로 정리했어요. 연도와 해석은 자료에 따라 조금씩 다를 수 있어요.<br>
+    학습 기록은 이 기기의 브라우저에만 저장돼요.
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
