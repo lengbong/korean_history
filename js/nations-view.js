@@ -2,7 +2,8 @@
  * 범이의 역사 탐험대 — 나라별 세계사 화면
  * 주소: #/nations (나라 고르기), #/nation/<나라>, #/nstory/<이야기>, #/nquiz/<나라>
  * 데이터: js/nations.js(지역·순서), js/nations-*.js(나라 이야기·사진·퀴즈)
- * 기록은 대원별로 player.nations = { read: [이야기 id], stamps: [나라 id], best: {나라: 점수}, mode } 에 저장해요.
+ * 기록은 대원별로 player.nations = { read: [이야기 id], stamps: [나라 id], best: {나라: 점수} } 에 저장해요.
+ * 이야기 수준(🌱/🌳/🎓)은 시대 이야기와 함께 player.storyMode에 저장해요(js/app.js).
  */
 (() => {
   'use strict';
@@ -13,11 +14,8 @@
   const $app = document.getElementById('app');
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const QUIZ_LEN = 5;
-  const MODES = {
-    easy: { icon: '🌱', name: '쉬운 이야기' },
-    normal: { icon: '🌳', name: '자세한 이야기' },
-    deep: { icon: '🎓', name: '어른용 이야기' },
-  };
+  // 이야기 수준은 한국사·세계사 탐험의 시대 이야기와 함께 써요 (js/app.js의 storyMode)
+  const MODES = A.STORY_MODES;
   const PRAISE = ['딩동댕! 정답이야! 🎉', '대단해! 세계사 박사구나! 🌍', '맞았어! 최고야! 👍', '정답! 역시 우리 대원! ✨'];
 
   // NATION_ORDER 순서대로, 순서표에 없는 나라는 뒤에 붙여요
@@ -54,8 +52,7 @@
     return d;
   }
   const readOf = n => n.episodes.filter(ep => nd().read.includes(ep.id)).length;
-  const levelMode = () => ({ 1: 'easy', 2: 'normal', 3: 'deep' }[A.me().level] || 'normal');
-  const modeNow = () => (MODES[nd().mode] ? nd().mode : levelMode());
+  const modeNow = () => A.storyMode();
   const cardsOf = n => (n.cards || []).map(id => A.cardById[id]).filter(Boolean);
 
   function photo(id, cls, alt) {
@@ -421,7 +418,8 @@
       </section>
       ${answered ? `
         <section class="feedback ${correct ? 'good' : 'bad'}" role="status">
-          <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${correct ? A.pick(PRAISE)
+          <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${correct ? (A.grown() ? A.praise() : A.pick(PRAISE))
+            : A.grown() ? A.wrongMsg(q)
             : q.type === 'ox' ? `아쉬워! 이 문장은 ${q.right === 'O' ? '⭕ 맞는' : '❌ 틀린'} 말이야.`
             : `아쉬워! 정답은 ‘${esc(q.right)}’${josaRight}.`}</strong></div>
           <p>${esc(q.explain)}</p>
@@ -465,9 +463,13 @@
     const bonus = (want - got.length) * 2; // 이 나라 카드를 다 모았으면 별로 대신 줘요
     A.award(score + bonus, got);
     const ratio = score / total;
-    const msg = ratio === 1 ? `만점! 너는 ${short(n)} 박사야! 🏆`
-      : ratio >= 0.6 ? '잘했어! 조금만 더 하면 만점이야! 💪'
-      : '괜찮아! 이야기를 다시 읽고 또 도전해 보자! 📖';
+    const msg = A.grown()
+      ? (ratio === 1 ? `만점입니다. ${short(n)}의 역사를 정확히 꿰고 계시네요. 🏆`
+        : ratio >= 0.6 ? '좋습니다. 틀린 문제의 해설을 다시 보며 빈틈을 채워 보세요.'
+        : '🎓 어른용 이야기를 읽고 다시 풀어 보세요. 📖')
+      : (ratio === 1 ? `만점! 너는 ${short(n)} 박사야! 🏆`
+        : ratio >= 0.6 ? '잘했어! 조금만 더 하면 만점이야! 💪'
+        : '괜찮아! 이야기를 다시 읽고 또 도전해 보자! 📖');
     A.sfx.win();
     if (ratio >= 0.6) A.confetti();
     const firstUnread = n.episodes.find(ep => !d.read.includes(ep.id)) || n.episodes[0];
@@ -506,8 +508,7 @@
     const m = t.closest('[data-nv-mode]');
     if (m) {
       A.stopSpeak();
-      nd().mode = m.dataset.nvMode;
-      A.save();
+      A.setStoryMode(m.dataset.nvMode);
       renderStoryText();
       A.sfx.tap();
       return;
