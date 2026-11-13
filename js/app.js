@@ -12,10 +12,15 @@
   const LEVELS = {
     1: { name: '쉬움', icon: '🌱', hint: '7~9살 추천 · 쉬운 말과 쉬운 문제' },
     2: { name: '보통', icon: '🌳', hint: '10살 이상 추천 · 더 자세한 이야기와 문제' },
-    3: { name: '심화', icon: '🎓', hint: '중고생·어른 추천 · 한국사능력검정시험 심화 대비 (탐험·퀴즈는 보통 수준)' },
+    3: { name: '심화', icon: '🎓', hint: '중고생·어른 추천 · 강의형 해설과 쟁점·사료, 해석형 문제, 한국사능력검정시험 심화 대비' },
   };
-  // 심화(3) 대원도 아이용 탐험·퀴즈에서는 보통(2) 수준으로 봐요
   const nextLevel = l => (l % 3) + 1;
+  // 시대 이야기와 나라별 이야기에서 고르는 글 수준 (대원마다 한 번 고르면 두 곳에 함께 적용돼요)
+  const STORY_MODES = {
+    easy: { icon: '🌱', name: '쉬운 이야기' },
+    normal: { icon: '🌳', name: '자세한 이야기' },
+    deep: { icon: '🎓', name: '어른용 이야기' },
+  };
   const TRACKS = {
     kr: { id: 'kr', name: '한국사', icon: '🐯', eras: ERAS, mix: 'mix' },
     world: { id: 'world', name: '세계사', icon: '🌍', eras: WORLD_ERAS, mix: 'mixw' },
@@ -31,6 +36,7 @@
   const MIX_LEN = 10;
   const MAX_PLAYERS = 8;
   const PRAISE = ['딩동댕! 정답이야! 🎉', '대단해! 역사 박사구나! 🎓', '맞았어! 최고야! 👍', '정답! 역시 우리 대원! ✨'];
+  const PRAISE_GROWN = ['정답입니다.', '맞습니다. 정확히 짚으셨어요.', '정답입니다. 해설로 한 번 더 확인해 보세요.', '정확합니다.'];
 
   ERAS.forEach(e => { e.track = 'kr'; });
   WORLD_ERAS.forEach(e => { e.track = 'world'; });
@@ -99,6 +105,53 @@
   }
 
   const me = () => state.players.find(p => p.id === state.currentId) || null;
+  // 심화(🎓) 대원은 어른 말투와 어른용 문제·해설로 봐요
+  const grown = () => { const p = me(); return !!p && p.level === 3; };
+  const praise = () => pick(grown() ? PRAISE_GROWN : PRAISE);
+  // 틀렸을 때 한마디 (q.right: 정답 보기 또는 'O'/'X')
+  const wrongMsg = q => grown()
+    ? (q.type === 'ox' ? `아쉽습니다. 이 문장은 ${q.right === 'O' ? '⭕ 맞는' : '❌ 틀린'} 설명입니다.` : `아쉽습니다. 정답은 ‘${esc(q.right)}’입니다.`)
+    : (q.type === 'ox' ? `아쉬워! 이 문장은 ${q.right === 'O' ? '⭕ 맞는' : '❌ 틀린'} 말이야.` : `아쉬워! 정답은 ‘${esc(q.right)}’${iya(q.right)}.`);
+
+  const levelMode = p => ({ 1: 'easy', 2: 'normal', 3: 'deep' }[p.level] || 'normal');
+  function storyMode() {
+    const p = me();
+    if (!p) return 'normal';
+    if (STORY_MODES[p.storyMode]) return p.storyMode;
+    const old = p.nations && p.nations.mode; // 예전에 나라별 세계사에서 고른 수준을 이어받아요
+    return STORY_MODES[old] ? old : levelMode(p);
+  }
+  function setStoryMode(m) {
+    const p = me();
+    if (p && STORY_MODES[m]) { p.storyMode = m; save(); }
+  }
+  const modeSwitch = (color, attr) => `<div class="story-mode" role="group" aria-label="이야기 수준 고르기" style="--nc:${color}">
+    ${Object.entries(STORY_MODES).map(([k, m]) => `<button type="button" ${attr}="${k}" aria-pressed="${storyMode() === k}"><span class="sm-icon" aria-hidden="true">${m.icon}</span><span>${m.name}</span></button>`).join('')}
+  </div>`;
+
+  // ---------- 어른용 깊이 읽기 (js/deep/<시대 id>.js를 필요할 때 불러와요) ----------
+  const deepLoads = {};
+  function loadDeep(id) {
+    const store = window.DEEP = window.DEEP || {};
+    if (store[id]) return Promise.resolve(store[id]);
+    if (!eraById[id]) return Promise.resolve(null);
+    if (!deepLoads[id]) {
+      deepLoads[id] = new Promise(resolve => {
+        const s = document.createElement('script');
+        s.src = `js/deep/${id}.js`;
+        s.onload = () => {
+          const d = store[id] || null;
+          if (d && Array.isArray(d.quiz)) d.quiz.forEach(q => { q.era = id; q.level = 3; q.deep = true; });
+          resolve(d);
+        };
+        s.onerror = () => { delete deepLoads[id]; s.remove(); resolve(null); };
+        document.head.appendChild(s);
+      });
+    }
+    return deepLoads[id];
+  }
+  const deepOf = id => (window.DEEP && window.DEEP[id]) || null;
+  const readMin = text => Math.max(1, Math.round(text.replace(/\s/g, '').length / 500));
 
   function setTrack(t) {
     if (TRACKS[t] && state.track !== t) { state.track = t; save(); }
@@ -230,9 +283,25 @@
       <h2 class="bigcard-name">${esc(c.name)}</h2>
       <p class="bigcard-nick">“${esc(c.nick)}”</p>
       <p class="bigcard-desc">${esc(c.desc)}</p>
-      <p class="bigcard-fact"><b>💡 알고 있니?</b> ${esc(c.fact)}</p>
+      <p class="bigcard-fact"><b>💡 ${grown() ? '덧붙이면' : '알고 있니?'}</b> ${esc(c.fact)}</p>
       ${speakBtn(`${c.name}. ${c.nick}. ${c.desc} ${c.fact}`)}
+      <div class="card-deep" data-card-deep="${c.id}"></div>
     </article>`;
+  }
+
+  // 카드 아래에 어른을 위한 해설을 붙여요 (불러오는 동안 팝업이 바뀌었으면 그냥 둬요)
+  function fillCardDeep(c) {
+    loadDeep(c.era).then(d => {
+      const box = document.querySelector(`#modal [data-card-deep="${c.id}"]`);
+      if (!box) return;
+      const paras = d && d.cards && d.cards[c.id];
+      if (!Array.isArray(paras) || !paras.length) { box.remove(); return; }
+      box.innerHTML = `<details ${storyMode() === 'deep' ? 'open' : ''}>
+        <summary>🎓 어른을 위한 해설 <small>약 ${readMin(paras.join(''))}분</small></summary>
+        ${paras.map(t => `<p>${esc(t)}</p>`).join('')}
+        ${speakBtn(`${c.name}. ${paras.join(' ')}`)}
+      </details>`;
+    });
   }
 
   function showCard(id) {
@@ -241,6 +310,7 @@
     if (me().cards.includes(id)) {
       sfx.card();
       openModal(bigCard(c), c.name);
+      fillCardDeep(c);
       return;
     }
     const era = eraById[c.era];
@@ -277,6 +347,7 @@
   function renderHud() {
     const p = me();
     document.body.classList.toggle('no-player', !p);
+    document.body.classList.toggle('grown', grown());
     $hud.innerHTML = (p ? `
       <a class="hud-player" href="#/players" title="대원 바꾸기"><span class="hud-avatar" aria-hidden="true">${p.avatar}</span><span class="hud-name">${esc(p.name)}</span><span class="visually-hidden"> 대원 (대원 바꾸기)</span></a>
       <span class="hud-stat" title="모은 별"><span aria-hidden="true">⭐</span><span class="visually-hidden">별</span><b>${p.stars}</b></span>
@@ -336,26 +407,36 @@
       </a>`;
     const tile = (href, emoji, title, sub, color) =>
       `<a class="menu-tile" href="${href}" style="--tile:${color}"><span class="menu-emoji" aria-hidden="true">${emoji}</span><span class="menu-title">${title}</span><span class="menu-sub">${sub}</span></a>`;
+    const g = grown();
     $app.innerHTML = `
       <section class="hero">
         <div class="mascot" aria-hidden="true">🐯</div>
         <div class="bubble">
-          <h1>안녕, ${esc(p.name)} 대원!</h1>
-          <p>나는 역사 탐험대장 <b>범이</b>야. 오늘은 어떤 모험을 떠나 볼까?</p>
+          ${g ? `<h1>${esc(p.name)} 님, 반갑습니다</h1>
+          <p>오늘은 어느 시대를 깊이 읽어 볼까요? 이야기마다 <b>🎓 어른용</b>을 고르면 사건의 배경과 구조, 학설과 논쟁, 사료와 그 행간까지 다룹니다.</p>`
+          : `<h1>안녕, ${esc(p.name)} 대원!</h1>
+          <p>나는 역사 탐험대장 <b>범이</b>야. 오늘은 어떤 모험을 떠나 볼까?</p>`}
         </div>
       </section>
-      ${p.level === 3 ? examBanner : ''}
-      <nav class="menu-grid" aria-label="놀이 고르기">
+      ${g ? examBanner : ''}
+      <nav class="menu-grid" aria-label="${g ? '메뉴 고르기' : '놀이 고르기'}">
+        ${g ? `
+        ${tile('#/timeline/kr', '🗺️', '한국사 탐구', '선사부터 현대까지, 왜 일어났고 무엇을 남겼나', '#2a9a63')}
+        ${tile('#/timeline/world', '🌍', '세계사 탐구', '문명의 탄생부터 기후 위기까지, 구조와 쟁점으로', '#1f8a8a')}
+        ${tile('#/quiz', '❓', '해석형 퀴즈', '사료·인과·쟁점을 묻는 어른용 문제', '#2f6fd0')}
+        ${tile('#/cards', '🃏', '인물·유산 도감', '카드마다 평가와 논쟁을 담은 어른용 해설', '#8a5cc7')}
+        ${tile('#/order', '🔢', '연표 감각', '사건 여섯 개를 시간순으로', '#e04848')}`
+        : `
         ${tile('#/timeline/kr', '🗺️', '한국사 탐험', '선사 시대부터 지금의 대한민국까지 시간 여행', '#2a9a63')}
         ${tile('#/timeline/world', '🌍', '세계사 탐험', '피라미드부터 우주 탐사까지 세계 여행', '#1f8a8a')}
         ${tile('#/quiz', '❓', '역사 퀴즈', 'OX 퀴즈와 골라 맞히기에 도전!', '#2f6fd0')}
         ${tile('#/cards', '🃏', '카드 도감', '인물과 문화유산 카드를 모아요', '#8a5cc7')}
-        ${tile('#/order', '🔢', '순서 맞추기', '무엇이 먼저 일어났을까?', '#e04848')}
+        ${tile('#/order', '🔢', '순서 맞추기', '무엇이 먼저 일어났을까?', '#e04848')}`}
       </nav>
       ${hook('home')}
-      ${p.level === 3 ? '' : examBanner}
+      ${g ? '' : examBanner}
       <section class="panel">
-        <h2>🎒 ${esc(p.name)} 대원의 탐험 기록</h2>
+        <h2>🎒 ${esc(p.name)} ${g ? '님의 학습 기록' : '대원의 탐험 기록'}</h2>
         <div class="stats">
           <div class="stat"><span class="stat-emoji" aria-hidden="true">🐯</span><span class="stat-num">${stamps('kr')} / ${ERAS.length}</span><span class="stat-label">한국사 도장</span></div>
           <div class="stat"><span class="stat-emoji" aria-hidden="true">🌍</span><span class="stat-num">${stamps('world')} / ${WORLD_ERAS.length}</span><span class="stat-label">세계사 도장</span></div>
@@ -364,10 +445,19 @@
         </div>
       </section>
       <section class="panel">
-        <h2>🤔 알쏭달쏭 역사 이야기</h2>
+        <h2>🤔 ${g ? '오늘의 역사 한 토막' : '알쏭달쏭 역사 이야기'}</h2>
         <div id="fact">${factHtml(pick(ALL_FACTS))}</div>
       </section>
-      <section class="panel tips">
+      ${g ? `<section class="panel tips">
+        <h2>🎓 어른 대원을 위한 안내</h2>
+        <ul>
+          <li><b>탐험의 시대 이야기</b>에서 <b>🎓 어른용 이야기</b>를 고르면 슬라이드마다 강의 한 편 분량(약 3~5분)의 해설이 나옵니다. 연도 나열보다 ‘왜’와 ‘그래서’에 집중했어요.</li>
+          <li>시대마다 <b>⚖️ 쟁점과 학설</b>(해석이 갈리는 대목), <b>📜 사료로 읽기</b>(기록과 그 행간), <b>🌗 빛과 그림자</b>(성취의 이면)가 붙습니다.</li>
+          <li><b>카드</b>를 열면 인물·유산에 대한 평가와 논쟁을 담은 <b>어른을 위한 해설</b>이 있고, <b>퀴즈</b>는 사료·인과·쟁점을 묻는 어른용 문제 위주로 나옵니다.</li>
+          <li>아이와 함께라면 같은 슬라이드를 <b>🌱 쉬운 이야기</b>로 바꿔 읽어 주고, 어른용 해설에서 배경을 보태 이야기해 보세요. 수준은 한 번 고르면 나라별 세계사에도 함께 적용됩니다.</li>
+          <li>한국사능력검정시험을 준비한다면 위의 <b>심화 대비</b>에서 개념 노트·기출 유형 문제·모의고사를 이용하세요.</li>
+        </ul>
+      </section>` : `<section class="panel tips">
         <h2>👨‍👩‍👧 가족과 함께 즐기는 방법</h2>
         <ul>
           <li>형·언니는 <b>보통</b>, 동생은 <b>쉬움</b>으로 각자 대원 등록을 해 보세요. 나이에 맞는 이야기와 문제가 나와요.</li>
@@ -375,8 +465,9 @@
           <li>시대 이야기 아래의 <b>‘그때 세계에서는?’</b> 상자를 보며 같은 때 우리나라와 세계에서 무슨 일이 있었는지 이야기해 보세요.</li>
           <li>퀴즈는 한 사람이 문제를 읽어 주고 다른 사람이 맞히는 방식으로 해 보세요.</li>
           <li>지갑 속 동전과 지폐에서 역사 인물과 문화유산을 찾아보세요. 10원·100원 동전, 만 원 지폐에 숨어 있어요!</li>
+          <li>어른은 이야기마다 <b>🎓 어른용 이야기</b>를 골라 보세요. 배경과 쟁점까지 알고 나면 아이에게 들려줄 이야기가 훨씬 풍성해져요.</li>
         </ul>
-      </section>`;
+      </section>`}`;
   }
 
   // ---------- 시대 탐험 (연표) ----------
@@ -389,7 +480,9 @@
       <header class="page-head">
         <h1>${track.id === 'kr' ? '🗺️' : '🌍'} ${track.name} 탐험</h1>
         ${trackSwitch(track.id, '#/timeline')}
-        <p>정거장을 눌러 그 시대로 시간 여행을 떠나요. 이야기를 끝까지 읽으면 <b>탐험 도장</b>과 <b>카드</b>를 받아요!</p>
+        <p>${grown()
+          ? '시대를 골라 읽어 보세요. 이야기마다 <b>🎓 어른용 이야기</b>를 고르면 강의형 해설과 함께 <b>쟁점과 학설 · 사료 · 빛과 그림자</b>가 붙습니다. 끝까지 읽으면 탐험 도장과 카드가 기록돼요.'
+          : '정거장을 눌러 그 시대로 시간 여행을 떠나요. 이야기를 끝까지 읽으면 <b>탐험 도장</b>과 <b>카드</b>를 받아요!'}</p>
       </header>
       ${hook('timeline', track.id)}
       <ol class="road">
@@ -429,7 +522,9 @@
         <span class="era-emoji" aria-hidden="true">${e.emoji}</span>
         <div><p class="era-track">${TRACKS[e.track].icon} ${TRACKS[e.track].name}</p><h1>${esc(e.name)}</h1><p>${esc(e.period)}</p></div>
       </header>
-      <section id="story" class="story"></section>
+      ${modeSwitch(e.color, 'data-era-mode')}
+      <section id="story" class="story" aria-live="polite"></section>
+      <div id="deep-panels"></div>
       <section class="panel compare ${e.track}">
         <h2>${compareTitle}</h2>
         <ul class="compare-list">
@@ -444,11 +539,11 @@
       </section>
       <section class="panel">
         <h2>🔑 핵심 낱말</h2>
-        <p class="hint">낱말 카드를 누르면 뜻이 나와요. 뜻을 먼저 맞혀 보세요!</p>
+        <p class="hint">${grown() ? '낱말을 누르면 뜻이 나옵니다.' : '낱말 카드를 누르면 뜻이 나와요. 뜻을 먼저 맞혀 보세요!'}</p>
         <div class="words">${e.words.map(([w, m]) => `<button class="word" type="button" data-action="flip-word" aria-pressed="false"><span class="word-front">${esc(w)}</span><span class="word-back">${esc(m)}</span></button>`).join('')}</div>
       </section>
       <section class="panel">
-        <h2>🤔 재미있는 사실</h2>
+        <h2>🤔 ${grown() ? '알아 두면 좋은 사실' : '재미있는 사실'}</h2>
         ${e.facts.map(f => `<p class="fact">${esc(f)}</p>`).join('')}
       </section>
       <section class="panel">
@@ -456,10 +551,11 @@
         <div class="card-grid small" id="era-cards"></div>
       </section>
       <div class="cta-row">
-        <a class="btn btn-blue" href="#/quiz/${e.id}">❓ ${esc(e.short)} 퀴즈 도전!</a>
+        <a class="btn btn-blue" href="#/quiz/${e.id}">❓ ${esc(e.short)} ${grown() ? '퀴즈 풀기' : '퀴즈 도전!'}</a>
         ${nextEra ? `<a class="btn btn-ghost" href="#/era/${nextEra.id}">다음 시대: ${esc(nextEra.short)} ▶</a>` : ''}
       </div>`;
     renderStory(false);
+    renderDeepPanels();
     renderEraCards();
   }
 
@@ -473,22 +569,89 @@
   function renderStory(focusNext) {
     const { era: e, idx } = eraState;
     const s = e.slides[idx];
-    const text = me().level === 1 ? s.easy : s.normal;
     const last = idx === e.slides.length - 1;
     const box = document.getElementById('story');
-    box.innerHTML = `
-      <div class="slide" style="--era:${e.color}">
+    if (!box) return;
+    let mode = storyMode();
+    let slide;
+    if (mode === 'deep') {
+      const d = deepOf(e.id);
+      const ds = d && d.slides && d.slides[idx];
+      if (!d && !eraState.deepFailed) {
+        // 처음 고르면 해설 파일을 불러온 뒤 다시 그려요
+        slide = `<div class="slide deep loading" style="--era:${e.color}"><p class="deep-kicker">🎓 어른용 이야기를 불러오는 중…</p><h2 class="slide-title">${esc(s.title)}</h2></div>`;
+        loadDeep(e.id).then(got => {
+          if (!eraState || eraState.era !== e) return;
+          if (!got) eraState.deepFailed = true;
+          renderStory(false);
+          renderDeepPanels();
+        });
+      } else if (ds) {
+        const body = ds.deep.join('');
+        slide = `<article class="slide deep" style="--era:${e.color}">
+          <p class="deep-kicker">🎓 어른용 이야기 · ${idx + 1} / ${e.slides.length} · 약 ${readMin(body)}분</p>
+          <h2 class="slide-title">${esc(s.title)}</h2>
+          ${ds.lead ? `<p class="deep-lead">${esc(ds.lead)}</p>` : ''}
+          <div class="deep-body">${ds.deep.map(t => `<p>${esc(t)}</p>`).join('')}</div>
+          ${speakBtn(`${s.title}. ${ds.deep.join(' ')}`)}
+        </article>`;
+      } else {
+        mode = 'normal'; // 해설이 없거나 불러오지 못하면 자세한 이야기로 보여 줘요
+      }
+    }
+    if (mode !== 'deep') {
+      const text = mode === 'easy' ? s.easy : s.normal;
+      const note = storyMode() === 'deep' ? '<p class="hint">이 슬라이드의 어른용 이야기를 불러오지 못해 자세한 이야기로 보여 드려요. 인터넷 연결을 확인한 뒤 다시 열어 주세요.</p>' : '';
+      slide = `<div class="slide" style="--era:${e.color}">
         <div class="slide-emoji" aria-hidden="true">${s.emoji}</div>
         <h2 class="slide-title">${esc(s.title)}</h2>
         <p class="slide-text">${esc(text)}</p>
+        ${note}
         ${speakBtn(`${s.title}. ${text}`)}
-      </div>
+      </div>`;
+    }
+    box.innerHTML = `${slide}
       <div class="slide-nav">
         <button class="btn btn-ghost" type="button" data-action="slide-prev" ${idx === 0 ? 'disabled' : ''}>◀ 이전</button>
         <span class="dots" role="img" aria-label="${e.slides.length}쪽 중 ${idx + 1}쪽">${e.slides.map((_, i) => `<i class="${i === idx ? 'on' : ''}"></i>`).join('')}</span>
-        <button class="btn btn-green" type="button" data-action="slide-next">${last ? '탐험 완료 🎖️' : '다음 ▶'}</button>
+        <button class="btn btn-green" type="button" data-action="slide-next">${last ? (grown() ? '다 읽었어요 🎖️' : '탐험 완료 🎖️') : '다음 ▶'}</button>
       </div>`;
     if (focusNext) box.querySelector('[data-action="slide-next"]').focus({ preventScroll: true });
+  }
+
+  // 🎓 어른용일 때만 시대 전체에 대한 쟁점·사료·명암 상자를 보여 줘요
+  function renderDeepPanels() {
+    const box = document.getElementById('deep-panels');
+    if (!box || !eraState) return;
+    const d = storyMode() === 'deep' ? deepOf(eraState.era.id) : null;
+    if (!d) { box.innerHTML = ''; return; }
+    const color = eraState.era.color;
+    const debates = d.debates || [];
+    const sources = d.sources || [];
+    const shadows = d.shadows || [];
+    box.innerHTML = `
+      ${debates.length ? `<section class="panel deep-panel" style="--era:${color}">
+        <h2>⚖️ 쟁점과 학설</h2>
+        <p class="hint">같은 사실을 두고도 해석이 갈리는 대목입니다.</p>
+        ${debates.map(x => `<article class="debate">
+          <h3>${esc(x.q)}</h3>
+          <div class="views">${(x.views || []).map(([name, text]) => `<div class="view"><b>${esc(name)}</b><p>${esc(text)}</p></div>`).join('')}</div>
+          ${x.now ? `<p class="debate-now"><b>지금의 연구는</b> ${esc(x.now)}</p>` : ''}
+        </article>`).join('')}
+      </section>` : ''}
+      ${sources.length ? `<section class="panel deep-panel" style="--era:${color}">
+        <h2>📜 사료로 읽기</h2>
+        <p class="hint">먼저 기록을 읽고 무엇이 보이는지 생각해 본 뒤 ‘행간 읽기’를 펼쳐 보세요.</p>
+        ${sources.map(x => `<figure class="source">
+          <blockquote>${esc(x.text)}</blockquote>
+          <figcaption>— ${esc(x.from)}</figcaption>
+          <details><summary>행간 읽기</summary><p>${esc(x.read)}</p></details>
+        </figure>`).join('')}
+      </section>` : ''}
+      ${shadows.length ? `<section class="panel deep-panel" style="--era:${color}">
+        <h2>🌗 빛과 그림자</h2>
+        ${shadows.map(x => `<article class="shadow-item"><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p></article>`).join('')}
+      </section>` : ''}`;
   }
 
   function moveSlide(step) {
@@ -509,8 +672,8 @@
     if (p.stamps.includes(e.id)) {
       openModal(`<div class="reward">
         <div class="stamp" style="--era:${e.color}">${e.emoji}<span>${esc(e.short)}</span></div>
-        <h2>${esc(e.short)} 탐험 완료!</h2>
-        <p>이미 도장을 받았어요. 이제 퀴즈로 실력을 확인해 볼까?</p>
+        <h2>${esc(e.short)} ${grown() ? '다 읽었습니다' : '탐험 완료!'}</h2>
+        <p>${grown() ? '이미 도장을 받은 시대입니다. 퀴즈로 이해를 점검해 보세요.' : '이미 도장을 받았어요. 이제 퀴즈로 실력을 확인해 볼까?'}</p>
         <div class="cta-row"><a class="btn btn-blue" href="#/quiz/${e.id}">❓ 퀴즈 도전</a><button class="btn btn-ghost" type="button" data-close>📖 다시 읽기</button></div>
       </div>`, '탐험 완료');
       return;
@@ -538,9 +701,23 @@
     if (!MIX_IDS[arg] && !eraById[arg]) { location.replace('#/quiz'); return; }
     const track = MIX_IDS[arg] || eraById[arg].track;
     setTrack(track);
-    quiz = { id: arg, track, qs: buildQuiz(arg), i: 0, score: 0, picked: null };
     $app.innerHTML = `<a class="back" href="#/quiz/${track}">← ${TRACKS[track].name} 퀴즈 고르기</a><div id="quiz"></div>`;
-    renderQuestion();
+    const start = () => {
+      quiz = { id: arg, track, qs: buildQuiz(arg), i: 0, score: 0, picked: null };
+      renderQuestion();
+    };
+    if (!grown()) { start(); return; }
+    // 심화 대원은 어른용 문제가 든 해설 파일을 먼저 불러와요 (못 불러오면 보통 문제로)
+    const ids = MIX_IDS[arg] ? TRACKS[track].eras.map(e => e.id) : [arg];
+    if (ids.every(deepOf)) { start(); return; }
+    quiz = null;
+    const box = document.getElementById('quiz');
+    box.innerHTML = '<p class="panel hint">🎓 어른용 문제를 불러오는 중…</p>';
+    const token = location.hash;
+    Promise.all(ids.map(loadDeep)).then(() => {
+      if (location.hash !== token || !document.getElementById('quiz')) return;
+      start();
+    });
   }
 
   function viewQuizMenu(arg) {
@@ -553,7 +730,9 @@
       <header class="page-head quiz-menu-top">
         <h1>❓ ${track.name} 퀴즈</h1>
         ${trackSwitch(track.id, '#/quiz')}
-        <p>시대를 골라 ${QUIZ_LEN}문제에 도전해요. <b>3문제 이상</b> 맞히면 그 시대의 카드를 1장, <b>만점</b>이면 2장 받아요!</p>
+        <p>${grown()
+          ? `시대를 골라 ${QUIZ_LEN}문제를 풉니다. 🎓 대원에게는 사료·인과·쟁점을 묻는 <b>어른용 문제</b>가 먼저 나오고, 문제마다 해설이 붙습니다.`
+          : `시대를 골라 ${QUIZ_LEN}문제에 도전해요. <b>3문제 이상</b> 맞히면 그 시대의 카드를 1장, <b>만점</b>이면 2장 받아요!`}</p>
         <p>지금 난이도: <b>${lv.icon} ${lv.name}</b> · <a href="#/players">난이도 바꾸기</a></p>
       </header>
       <a class="mix-btn" href="#/quiz/${track.mix}">
@@ -576,19 +755,26 @@
   function buildQuiz(id) {
     const level = me().level;
     const allowed = q => level >= 2 || q.level === 1;
+    // 심화 대원에게는 어른용 문제(js/deep/*.js의 quiz)를 먼저 내요
+    const deepQs = eid => (level >= 3 && deepOf(eid) && Array.isArray(deepOf(eid).quiz)) ? deepOf(eid).quiz : [];
     let qs;
     if (MIX_IDS[id]) {
       // 시대마다 한 문제씩 뽑고, 모자란 만큼 더 채워요
-      const perEra = TRACKS[MIX_IDS[id]].eras.map(e => shuffle(ALL_QUESTIONS.filter(q => q.era === e.id && allowed(q))));
+      const perEra = TRACKS[MIX_IDS[id]].eras.map(e => {
+        const base = ALL_QUESTIONS.filter(q => q.era === e.id && allowed(q));
+        const deep = deepQs(e.id);
+        return deep.length ? shuffle(deep).concat(shuffle(base.filter(q => q.level === 2))) : shuffle(base);
+      });
       const firsts = perEra.map(list => list[0]).filter(Boolean);
       const rest = shuffle(perEra.flatMap(list => list.slice(1)));
       qs = shuffle(firsts.concat(rest).slice(0, MIX_LEN));
     } else {
       const pool = ALL_QUESTIONS.filter(q => q.era === id && allowed(q));
       if (level >= 2) {
-        const hard = shuffle(pool.filter(q => q.level === 2)).slice(0, 3);
-        const easy = shuffle(pool.filter(q => q.level === 1)).slice(0, QUIZ_LEN - hard.length);
-        qs = shuffle(hard.concat(easy));
+        const deep = shuffle(deepQs(id)).slice(0, 4);
+        const hard = shuffle(pool.filter(q => q.level === 2)).slice(0, deep.length ? QUIZ_LEN - deep.length : 3);
+        const easy = shuffle(pool.filter(q => q.level === 1)).slice(0, QUIZ_LEN - deep.length - hard.length);
+        qs = shuffle(deep.concat(hard, easy));
       } else {
         qs = shuffle(pool).slice(0, QUIZ_LEN);
       }
@@ -630,16 +816,14 @@
       </div>
       <div class="bar" role="progressbar" aria-label="진행" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${(done / total) * 100}%"></i></div>
       <section class="qcard ${answered ? '' : 'enter'}">
-        <span class="qtype">${q.type === 'ox' ? '⭕❌ OX 퀴즈' : '골라 맞히기'}</span>
+        <span class="qtype">${q.deep ? '🎓 어른용 · ' : ''}${q.type === 'ox' ? '⭕❌ OX 퀴즈' : '골라 맞히기'}</span>
         <h1 class="qtext">${esc(q.q)}</h1>
         ${speakBtn(readText)}
         ${options}
       </section>
       ${answered ? `
         <section class="feedback ${correct ? 'good' : 'bad'}" role="status">
-          <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${correct ? pick(PRAISE)
-            : q.type === 'ox' ? `아쉬워! 이 문장은 ${q.right === 'O' ? '⭕ 맞는' : '❌ 틀린'} 말이야.`
-            : `아쉬워! 정답은 ‘${esc(q.right)}’${iya(q.right)}.`}</strong></div>
+          <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${correct ? praise() : wrongMsg(q)}</strong></div>
           <p>${esc(q.explain)}</p>
           <button class="btn btn-blue" type="button" data-action="next-q">${quiz.i + 1 < total ? '다음 문제 ▶' : '결과 보기 🏆'}</button>
         </section>` : ''}`;
@@ -691,9 +875,13 @@
     award(score + bonus, got);
 
     const ratio = score / total;
-    const msg = ratio === 1 ? '만점! 너는 진정한 역사 박사야! 🏆'
-      : ratio >= 0.6 ? '잘했어! 조금만 더 하면 만점이야! 💪'
-      : '괜찮아! 이야기를 다시 읽고 또 도전해 보자! 📖';
+    const msg = grown()
+      ? (ratio === 1 ? '만점입니다. 이 시대의 흐름을 정확히 꿰고 계시네요. 🏆'
+        : ratio >= 0.6 ? '좋습니다. 틀린 문제의 해설을 다시 보며 빈틈을 채워 보세요.'
+        : '🎓 어른용 이야기와 쟁점·사료 상자를 읽고 다시 풀어 보세요. 📖')
+      : (ratio === 1 ? '만점! 너는 진정한 역사 박사야! 🏆'
+        : ratio >= 0.6 ? '잘했어! 조금만 더 하면 만점이야! 💪'
+        : '괜찮아! 이야기를 다시 읽고 또 도전해 보자! 📖');
     sfx.win();
     if (ratio >= 0.6) confetti();
 
@@ -738,7 +926,9 @@
       <header class="page-head">
         <h1>🃏 카드 도감</h1>
         ${trackSwitch(track.id, '#/cards')}
-        <p>이야기를 끝까지 읽고 퀴즈를 풀면 카드가 모여요. 카드를 눌러 이야기를 읽어 보세요!</p>
+        <p>${grown()
+          ? '이야기를 끝까지 읽고 퀴즈를 풀면 카드가 모입니다. 카드를 열면 평가와 논쟁을 담은 <b>🎓 어른을 위한 해설</b>이 있어요.'
+          : '이야기를 끝까지 읽고 퀴즈를 풀면 카드가 모여요. 카드를 눌러 이야기를 읽어 보세요!'}</p>
       </header>
       <div class="meter">
         <span>${track.icon} ${track.name} 카드 <b>${have}</b> / ${pool.length}${have === pool.length ? ' 🎉 모두 모았어요!' : ''}</span>
@@ -787,7 +977,7 @@
   function newOrderRound() {
     const level = me().level;
     const mode = state.orderMode;
-    const n = level === 1 ? 3 : 5;
+    const n = level === 1 ? 3 : level === 3 ? 6 : 5;
     const pool = mode === 'mix' ? ALL_EVENTS : ALL_EVENTS.filter(ev => trackOf(ev) === mode);
     let picks;
     if (level === 1 && mode !== 'mix') {
@@ -836,7 +1026,9 @@
     if (o.checked) {
       const { ok, got, bonus } = o.result;
       bottom = `<section class="feedback ${ok === n ? 'good' : 'bad'}" role="status">
-        <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${ok === n ? '완벽해! 시간 여행 박사구나!' : `${n}개 중 ${ok}개 맞았어! 바른 순서를 확인해 보자.`}</strong></div>
+        <div class="fb-head"><span class="fb-mascot" aria-hidden="true">🐯</span><strong>${grown()
+          ? (ok === n ? '모두 맞습니다. 연표 감각이 정확하시네요.' : `${n}개 중 ${ok}개가 제자리입니다. 바른 순서를 확인해 보세요.`)
+          : (ok === n ? '완벽해! 시간 여행 박사구나!' : `${n}개 중 ${ok}개 맞았어! 바른 순서를 확인해 보자.`)}</strong></div>
         ${ok < n ? `<ol class="answer-list">${sorted.map(ev => `<li><b>${esc(ev.when)}</b> ${esc(ev.label)}</li>`).join('')}</ol>` : ''}
         <p>⭐ 별 ${ok + bonus}개를 받았어요.${bonus ? ' (카드를 모두 모아서 보너스 별!)' : ''}</p>
         ${got.length ? `<h3>🎁 보너스 카드!</h3>${rewardCards(got)}` : ''}
@@ -951,8 +1143,7 @@
     state.currentId = p.id;
     save();
     sfx.win();
-    // 심화 대원은 바로 한능검 심화 학습으로 안내해요
-    location.hash = p.level === 3 ? '#/exam' : '#/home';
+    location.hash = '#/home';
   }
 
   function deletePlayer(id) {
@@ -973,6 +1164,7 @@
     registerHook: (name, fn) => { hooks[name] = fn; },
     me, save, esc, shuffle, pick, sfx, confetti, openModal, closeModal, focusHeading,
     award, cardTile, rewardCards, speakBtn, stopSpeak, cardById, eraById,
+    grown, praise, wrongMsg, storyMode, setStoryMode, STORY_MODES, loadDeep, readMin,
   };
 
   // ---------- 이벤트 ----------
@@ -986,6 +1178,17 @@
     const link = t.closest('a[href^="#/"]');
     if (link) {
       if (link.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
+      sfx.tap();
+      return;
+    }
+
+    const modeEl = t.closest('[data-era-mode]');
+    if (modeEl && eraState) {
+      stopSpeak();
+      setStoryMode(modeEl.dataset.eraMode);
+      document.querySelectorAll('[data-era-mode]').forEach(b => b.setAttribute('aria-pressed', String(b === modeEl)));
+      renderStory(false);
+      renderDeepPanels();
       sfx.tap();
       return;
     }
@@ -1034,7 +1237,13 @@
         break;
       case 'toggle-level': {
         const target = state.players.find(x => x.id === act.dataset.id);
-        if (target) { target.level = nextLevel(target.level); save(); viewPlayers(); sfx.tap(); }
+        if (target) {
+          target.level = nextLevel(target.level);
+          // 난이도를 바꾸면 이야기 수준도 새 난이도의 기본값으로 돌아가요
+          delete target.storyMode;
+          if (target.nations) delete target.nations.mode;
+          save(); viewPlayers(); renderHud(); sfx.tap();
+        }
         break;
       }
       case 'delete': deletePlayer(act.dataset.id); break;

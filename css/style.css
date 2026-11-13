@@ -1110,3 +1110,66 @@ button.dict-chip:hover { filter: brightness(0.95); }
 .dict-pic { font-size: 0.85rem; }
 .dict-item-sum { font-size: 0.9rem; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .dict-empty { text-align: center; }
+
+/* ---------- 🎓 어른용 깊이 읽기 (시대 이야기·카드) ---------- */
+:root { --font-serif: 'Gowun Batang', 'AppleMyungjo', 'Batang', 'Noto Serif KR', serif; }
+.era-banner + .story-mode { margin: 16px 0 0; }
+.story-mode + .story { margin-top: 12px; }
+.slide.deep { text-align: left; padding: 22px clamp(18px, 4vw, 34px) 24px; }
+.slide.deep .slide-title { font-size: clamp(1.4rem, 4vw, 1.75rem); margin-bottom: 0.3em; }
+.slide.deep.loading { min-height: 160px; }
+.deep-kicker { margin: 0 0 6px; font-size: 0.88rem; color: var(--muted); letter-spacing: 0.01em; }
+.deep-lead {
+  margin: 0 0 1.1em; padding: 10px 14px; border-left: 4px solid color-mix(in srgb, var(--era) 60%, white);
+  background: color-mix(in srgb, var(--era) 7%, white); border-radius: 0 12px 12px 0;
+  font-family: var(--font-serif); font-weight: 700; font-size: 1.08rem; line-height: 1.65;
+}
+.deep-body { max-width: 680px; }
+.deep-body p {
+  font-family: var(--font-serif); font-size: 1.07rem; line-height: 2; margin: 0 0 1.05em;
+  text-indent: 0.7em; letter-spacing: -0.003em;
+}
+.deep-body p:last-child { margin-bottom: 0.8em; }
+
+.deep-panel h2 { margin-bottom: 0.15em; }
+.deep-panel > .hint { margin-bottom: 12px; }
+.debate { padding: 14px 0 4px; border-top: 2px dashed var(--line); }
+.debate:first-of-type { border-top: 0; padding-top: 4px; }
+.debate h3 { font-family: var(--font-serif); font-weight: 700; font-size: 1.12rem; color: color-mix(in srgb, var(--era) 65%, black); }
+.views { display: grid; gap: 10px; margin: 8px 0 10px; }
+@media (min-width: 720px) { .views { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
+.view { padding: 12px 14px; border-radius: 14px; background: var(--paper-2); border: 2px solid var(--line); }
+.view b { display: block; margin-bottom: 4px; font-size: 1rem; }
+.view p { margin: 0; font-size: 0.98rem; line-height: 1.75; }
+.debate-now { font-size: 0.98rem; line-height: 1.75; padding: 10px 14px; border-radius: 12px; background: #eef5ff; }
+.debate-now b { margin-right: 4px; color: var(--blue); }
+
+.source { margin: 0 0 14px; padding: 14px 16px; border-radius: 16px; background: #fbf6ec; border: 2px solid #eadcc1; }
+.source:last-child { margin-bottom: 0; }
+.source blockquote {
+  margin: 0; font-family: var(--font-serif); font-size: 1.04rem; line-height: 1.9;
+  quotes: '“' '”'; position: relative; padding-left: 14px; border-left: 3px solid #c9ad7c;
+}
+.source figcaption { margin: 6px 0 4px; font-size: 0.9rem; color: var(--muted); text-align: right; }
+.source details summary, .card-deep summary {
+  cursor: pointer; display: inline-block; font-family: var(--font-display); color: var(--blue); padding: 4px 0;
+}
+.source details p { margin: 6px 0 0; font-size: 0.98rem; line-height: 1.8; }
+
+.shadow-item { padding: 12px 14px; margin: 0 0 10px; border-radius: 14px; background: #f3f0f7; border-left: 5px solid #6c5a8a; }
+.shadow-item:last-child { margin-bottom: 0; }
+.shadow-item h3 { font-family: var(--font-serif); font-weight: 700; font-size: 1.08rem; margin-bottom: 4px; }
+.shadow-item p { margin: 0; line-height: 1.85; }
+
+.card-deep { text-align: left; margin-top: 12px; }
+.card-deep:empty { display: none; }
+.card-deep details { padding: 10px 14px; border-radius: 14px; background: #fff; border: 2px solid color-mix(in srgb, var(--era) 30%, white); }
+.card-deep summary { font-size: 1.05rem; }
+.card-deep summary small { font-family: var(--font-body); color: var(--muted); font-size: 0.82rem; margin-left: 4px; }
+.card-deep p { font-family: var(--font-serif); font-size: 1rem; line-height: 1.9; margin: 8px 0 0; }
+
+/* 심화(🎓) 대원: 제목 글꼴과 장식을 차분하게 */
+body.grown { --font-display: 'Gowun Batang', 'AppleMyungjo', 'Batang', 'Noto Serif KR', serif; background-image: none; }
+body.grown h1, body.grown h2, body.grown h3, body.grown .menu-title, body.grown .stop-name { font-weight: 700; }
+body.grown .mascot { animation: none; width: 72px; height: 72px; font-size: 2.8rem; }
+body.grown .bubble h1 { font-size: clamp(1.4rem, 4vw, 1.8rem); }
