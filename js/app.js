@@ -80,7 +80,7 @@
   let state = load();
 
   function load() {
-    const empty = { players: [], currentId: null, sound: true, track: 'kr', orderMode: 'kr' };
+    const empty = { players: [], currentId: null, sound: true, track: 'kr', orderMode: 'kr', ui: {} };
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (!raw) return empty;
@@ -105,6 +105,36 @@
   }
 
   const me = () => state.players.find(p => p.id === state.currentId) || null;
+  // ---------- 화면 설정: 테마·글자 크기 (대원마다 따로, 대원이 없을 때는 기기 기본값) ----------
+  const FONT_SCALES = [1, 1.1, 1.2, 1.35];
+  const FONT_NAMES = ['보통', '크게', '더 크게', '가장 크게'];
+  const THEMES = { light: '☀️ 밝게', dark: '🌙 어둡게', auto: '🖥️ 기기 설정대로' };
+  const darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function ui() {
+    const p = me();
+    const u = Object.assign({ theme: 'light', font: 0 }, state.ui, p && p.ui);
+    if (!THEMES[u.theme]) u.theme = 'light';
+    if (!FONT_SCALES[u.font]) u.font = 0;
+    return u;
+  }
+  function setUi(patch) {
+    const p = me();
+    if (p) p.ui = Object.assign({}, p.ui, patch);
+    else state.ui = Object.assign({}, state.ui, patch);
+    save();
+    applyUi();
+  }
+  // index.html 머리의 짧은 스크립트가 같은 일을 먼저 해 둬요(화면이 번쩍이지 않게)
+  function applyUi() {
+    const u = ui();
+    const dark = u.theme === 'dark' || (u.theme === 'auto' && !!darkQuery && darkQuery.matches);
+    const root = document.documentElement;
+    if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+    root.style.setProperty('--rs', String(FONT_SCALES[u.font]));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#1b1714' : '#fff6e6');
+  }
+
   // 심화(🎓) 대원은 어른 말투와 어른용 문제·해설로 봐요
   const grown = () => { const p = me(); return !!p && p.level === 3; };
   const praise = () => pick(grown() ? PRAISE_GROWN : PRAISE);
@@ -433,11 +463,12 @@
     const p = me();
     document.body.classList.toggle('no-player', !p);
     document.body.classList.toggle('grown', grown());
+    applyUi();
     $hud.innerHTML = (p ? `
       <a class="hud-player" href="#/players" title="대원 바꾸기"><span class="hud-avatar" aria-hidden="true">${p.avatar}</span><span class="hud-name">${esc(p.name)}</span><span class="visually-hidden"> 대원 (대원 바꾸기)</span></a>
       <span class="hud-stat" title="모은 별"><span aria-hidden="true">⭐</span><span class="visually-hidden">별</span><b>${p.stars}</b></span>
       <span class="hud-stat" title="모은 카드"><span aria-hidden="true">🃏</span><span class="visually-hidden">카드</span><b>${p.cards.length}</b></span>` : '') +
-      `<button class="hud-sound" type="button" data-action="sound" aria-pressed="${state.sound}" title="효과음 켜기/끄기"><span aria-hidden="true">${state.sound ? '🔊' : '🔇'}</span><span class="visually-hidden">효과음</span></button>`;
+      `<button class="hud-sound" type="button" data-action="settings" title="설정: 효과음·화면·글자 크기·기록 백업"><span aria-hidden="true">⚙️</span><span class="visually-hidden">설정</span></button>`;
   }
 
   function setActiveTab(page) {
@@ -1262,7 +1293,7 @@
     const name = String(data.get('name') || '').trim().slice(0, 8);
     if (!name) { form.querySelector('input[name="name"]').focus(); return; }
     const p = Object.assign(blankPlayer(), {
-      id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      id: newId(),
       name,
       avatar: AVATARS.includes(data.get('avatar')) ? data.get('avatar') : AVATARS[0],
       level: LEVELS[data.get('level')] ? Number(data.get('level')) : 1,
@@ -1282,6 +1313,130 @@
     if (state.currentId === id) state.currentId = state.players[0] ? state.players[0].id : null;
     save();
     route();
+  }
+
+  // ---------- 설정 창: 효과음·테마·글자 크기·기록 백업 ----------
+  function settingsHtml() {
+    const u = ui();
+    const p = me();
+    const pick3 = (name, value, opts) => `<div class="set-opts" role="group">${opts.map(([v, label]) =>
+      `<button type="button" data-set="${name}" data-value="${v}" aria-pressed="${String(v) === String(value)}">${label}</button>`).join('')}</div>`;
+    const canShare = !!(navigator.canShare && window.File && (() => { try { return navigator.canShare({ files: [backupFile('txt')] }); } catch (e) { return false; } })());
+    return `
+      <h2>⚙️ 설정</h2>
+      <div class="set-row"><h3>🔊 효과음</h3>${pick3('sound', state.sound, [[true, '켜기'], [false, '끄기']])}</div>
+      <div class="set-row"><h3>🎨 화면</h3>${pick3('theme', u.theme, Object.entries(THEMES))}</div>
+      <div class="set-row"><h3>🔎 글자 크기</h3>${pick3('font', u.font, FONT_NAMES.map((n, i) => [i, n]))}
+        <p class="set-sample">긴 글을 읽기 편한 크기로 골라 보세요. 세종은 1446년 훈민정음을 반포했습니다.</p></div>
+      <p class="hint">${p ? `화면과 글자 크기는 <b>${esc(p.name)}</b> 대원에게만 적용돼요. 대원마다 따로 정할 수 있어요.` : '대원을 등록하면 화면과 글자 크기를 대원마다 따로 정할 수 있어요.'}</p>
+      <div class="set-row"><h3>💾 학습 기록 백업</h3>
+        <p class="hint">학습 기록은 이 기기의 브라우저에만 저장돼요. 휴대폰을 바꾸거나 브라우저 기록을 지우기 전에 파일로 저장해 두면, 다른 기기에서 불러올 수 있어요.</p>
+        <div class="row-gap">
+          <button class="btn btn-ghost" type="button" data-action="backup-save" ${state.players.length ? '' : 'disabled'}>💾 파일로 저장</button>
+          ${canShare ? `<button class="btn btn-ghost" type="button" data-action="backup-share" ${state.players.length ? '' : 'disabled'}>📤 보내기(공유)</button>` : ''}
+          <button class="btn btn-ghost" type="button" data-action="backup-load">📂 파일에서 불러오기</button>
+          <input type="file" id="backup-file" accept=".json,.txt,application/json,text/plain" hidden>
+        </div>
+        <p class="hint" id="backup-msg" role="status"></p>
+      </div>`;
+  }
+  function openSettings() {
+    openModal(`<div class="settings" id="settings">${settingsHtml()}</div>`, '설정');
+  }
+  function changeSetting(name, value) {
+    if (name === 'sound') { state.sound = value === 'true'; save(); }
+    else if (name === 'theme' && THEMES[value]) setUi({ theme: value });
+    else if (name === 'font' && FONT_SCALES[Number(value)]) setUi({ font: Number(value) });
+    const box = document.getElementById('settings');
+    if (box) {
+      box.innerHTML = settingsHtml();
+      const on = box.querySelector(`[data-set="${name}"][aria-pressed="true"]`);
+      if (on) on.focus({ preventScroll: true });
+    }
+    sfx.tap();
+  }
+
+  const newId = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function backupFile(ext) {
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    const body = JSON.stringify({ app: 'beomi-history', version: 1, savedAt: d.toISOString(), state });
+    return new File([body], `history-backup-${stamp}.${ext}`, { type: ext === 'txt' ? 'text/plain' : 'application/json' });
+  }
+  const backupMsg = text => { const el = document.getElementById('backup-msg'); if (el) el.textContent = text; };
+  function saveBackup() {
+    try {
+      const url = URL.createObjectURL(backupFile('json'));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = backupFile('json').name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      backupMsg(`대원 ${state.players.length}명의 기록을 파일로 저장했어요. 내려받은 파일을 잘 보관해 주세요.`);
+    } catch (e) {
+      backupMsg('이 브라우저에서는 파일로 저장할 수 없어요.');
+    }
+  }
+  function shareBackup() {
+    try {
+      navigator.share({ files: [backupFile('txt')], title: '역사 탐험대 학습 기록' })
+        .then(() => backupMsg('기록 파일을 보냈어요. 받은 기기에서 ‘파일에서 불러오기’로 열어 주세요.'), () => { /* 공유를 취소함 */ });
+    } catch (e) {
+      backupMsg('이 브라우저에서는 보내기를 쓸 수 없어요. ‘파일로 저장’을 써 주세요.');
+    }
+  }
+  // 불러온 기록에서 화면에 그대로 쓰이는 값은 믿지 않고 다시 확인해요
+  function cleanPlayer(raw) {
+    if (!raw || typeof raw !== 'object' || typeof raw.name !== 'string' || !raw.name.trim()) return null;
+    const p = Object.assign(blankPlayer(), raw);
+    p.id = /^[A-Za-z0-9_-]{1,40}$/.test(String(raw.id)) ? String(raw.id) : newId();
+    p.name = raw.name.trim().slice(0, 8);
+    p.avatar = AVATARS.includes(raw.avatar) ? raw.avatar : AVATARS[0];
+    p.level = LEVELS[raw.level] ? Number(raw.level) : 1;
+    p.stars = Math.max(0, Math.floor(Number(raw.stars)) || 0);
+    p.cards = Array.isArray(raw.cards) ? [...new Set(raw.cards.filter(id => cardById[id]))] : [];
+    p.stamps = Array.isArray(raw.stamps) ? [...new Set(raw.stamps.filter(id => eraById[id]))] : [];
+    p.best = {};
+    if (raw.best && typeof raw.best === 'object') {
+      Object.entries(raw.best).forEach(([k, v]) => { if (Number.isFinite(v) && v >= 0 && v <= MIX_LEN) p.best[k] = v; });
+    }
+    if (!STORY_MODES[p.storyMode]) delete p.storyMode;
+    if (p.ui && typeof p.ui === 'object') p.ui = { theme: THEMES[p.ui.theme] ? p.ui.theme : 'light', font: FONT_SCALES[p.ui.font] ? Number(p.ui.font) : 0 };
+    else delete p.ui;
+    ['nations', 'exam'].forEach(k => { if (p[k] && (typeof p[k] !== 'object' || Array.isArray(p[k]))) delete p[k]; });
+    return p;
+  }
+  function loadBackup(file) {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { backupMsg('파일이 너무 커요. 역사 탐험대에서 저장한 기록 파일이 맞는지 확인해 주세요.'); return; }
+    const reader = new FileReader();
+    reader.onerror = () => backupMsg('파일을 읽지 못했어요.');
+    reader.onload = () => {
+      let data = null;
+      try { data = JSON.parse(String(reader.result)); } catch (e) { /* 아래에서 안내 */ }
+      const players = data && data.app === 'beomi-history' && data.state && Array.isArray(data.state.players)
+        ? data.state.players.map(cleanPlayer).filter(Boolean) : null;
+      if (!players || !players.length) { backupMsg('역사 탐험대에서 저장한 기록 파일이 아니에요.'); return; }
+      const same = players.filter(p => state.players.some(x => x.id === p.id));
+      const fresh = players.filter(p => !state.players.some(x => x.id === p.id));
+      const room = MAX_PLAYERS - state.players.length;
+      const added = fresh.slice(0, Math.max(0, room));
+      const lines = [];
+      if (same.length) lines.push(`• 이미 있는 대원 ${same.length}명(${same.map(p => p.name).join(', ')})은 불러온 기록으로 바뀌어요.`);
+      if (added.length) lines.push(`• 새 대원 ${added.length}명(${added.map(p => p.name).join(', ')})이 추가돼요.`);
+      if (fresh.length > added.length) lines.push(`• 대원은 ${MAX_PLAYERS}명까지라서 ${fresh.length - added.length}명은 불러오지 못해요.`);
+      if (!same.length && !added.length) { backupMsg(`대원이 이미 ${MAX_PLAYERS}명이라 불러올 수 없어요. 먼저 대원을 지워 주세요.`); return; }
+      if (!window.confirm(`기록을 불러올까요?\n${lines.join('\n')}`)) return;
+      state.players = state.players.map(x => same.find(p => p.id === x.id) || x).concat(added);
+      if (!me()) state.currentId = state.players[0].id;
+      save();
+      closeModal(false);
+      sfx.win();
+      if (location.hash === '#/players') route(); else location.hash = '#/players';
+    };
+    reader.readAsText(file);
   }
 
   // ---------- 다른 파일(js/exam-view.js 등)이 화면을 덧붙일 수 있게 ----------
@@ -1314,6 +1469,9 @@
       return;
     }
 
+    const setEl = t.closest('[data-set]');
+    if (setEl) { changeSetting(setEl.dataset.set, setEl.dataset.value); return; }
+
     const yt = t.closest('[data-yt]');
     if (yt) { playVideo(yt); return; }
     const ytClose = t.closest('[data-yt-close]');
@@ -1339,12 +1497,10 @@
     const act = t.closest('[data-action]');
     if (!act || act.disabled) return;
     switch (act.dataset.action) {
-      case 'sound':
-        state.sound = !state.sound;
-        save();
-        renderHud();
-        sfx.tap();
-        break;
+      case 'settings': openSettings(); sfx.tap(); break;
+      case 'backup-save': saveBackup(); break;
+      case 'backup-share': shareBackup(); break;
+      case 'backup-load': { const f = document.getElementById('backup-file'); if (f) { f.value = ''; f.click(); } break; }
       case 'next-fact':
         document.getElementById('fact').innerHTML = factHtml(pick(ALL_FACTS));
         document.querySelector('[data-action="next-fact"]').focus();
@@ -1386,6 +1542,14 @@
       case 'delete': deletePlayer(act.dataset.id); break;
     }
   });
+
+  document.addEventListener('change', e => {
+    if (e.target.id === 'backup-file') loadBackup(e.target.files && e.target.files[0]);
+  });
+  if (darkQuery) {
+    const onScheme = () => applyUi();
+    if (darkQuery.addEventListener) darkQuery.addEventListener('change', onScheme); else if (darkQuery.addListener) darkQuery.addListener(onScheme);
+  }
 
   document.addEventListener('submit', e => {
     if (e.target.id === 'new-player') { e.preventDefault(); addPlayer(e.target); }

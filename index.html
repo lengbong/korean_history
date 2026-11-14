@@ -13,6 +13,24 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="역사 탐험대">
+  <script>
+    // 저장해 둔 화면 설정(어둡게·글자 크기)을 화면이 그려지기 전에 먼저 적용해요 (자세한 처리는 js/app.js의 applyUi)
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('beomi-korean-history-v1') || 'null');
+        if (!s) return;
+        var p = (s.players || []).filter(function (x) { return x.id === s.currentId; })[0];
+        var u = {}, k;
+        for (k in (s.ui || {})) u[k] = s.ui[k];
+        for (k in ((p && p.ui) || {})) u[k] = p.ui[k];
+        var dark = u.theme === 'dark' || (u.theme === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        var root = document.documentElement;
+        if (dark) root.setAttribute('data-theme', 'dark');
+        var scale = [1, 1.1, 1.2, 1.35][u.font];
+        if (scale) root.style.setProperty('--rs', scale);
+      } catch (e) { /* 저장이 막힌 브라우저 */ }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">

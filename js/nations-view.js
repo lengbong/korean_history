@@ -362,27 +362,61 @@
   // ---------- 나라 퀴즈 ----------
   let nq = null;
 
+  // 어른용 문제(js/deep/nations/<나라 id>.js)는 심화 대원이 퀴즈를 열 때만 불러와요
+  const deepLoads = {};
+  function loadNationDeep(id) {
+    const store = window.NATION_DEEP = window.NATION_DEEP || {};
+    if (store[id]) return Promise.resolve(store[id]);
+    if (!deepLoads[id]) {
+      deepLoads[id] = new Promise(resolve => {
+        const s = document.createElement('script');
+        s.src = `js/deep/nations/${id}.js`;
+        s.onload = () => {
+          const d = store[id] || null;
+          if (d && Array.isArray(d.quiz)) d.quiz.forEach(q => { q.level = 3; q.deep = true; });
+          resolve(d);
+        };
+        s.onerror = () => { delete deepLoads[id]; s.remove(); resolve(null); };
+        document.head.appendChild(s);
+      });
+    }
+    return deepLoads[id];
+  }
+
   function viewQuiz(id) {
     const n = byId[id];
     if (!n) { location.replace('#/nations'); return; }
-    const level = A.me().level;
-    const pool = n.quiz.filter(q => level >= 2 || q.level === 1);
-    let qs;
-    if (level >= 2) {
-      const hard = shuffle(pool.filter(q => q.level === 2)).slice(0, 2);
-      const easy = shuffle(pool.filter(q => q.level === 1)).slice(0, QUIZ_LEN - hard.length);
-      qs = shuffle(hard.concat(easy));
-    } else {
-      qs = shuffle(pool).slice(0, QUIZ_LEN);
-    }
-    nq = {
-      n, i: 0, score: 0, picked: null,
-      qs: qs.map(q => q.type === 'mc'
-        ? Object.assign({}, q, { opts: shuffle(q.choices), right: q.choices[0] })
-        : Object.assign({}, q, { opts: ['O', 'X'], right: q.answer ? 'O' : 'X' })),
-    };
     $app.innerHTML = `<a class="back" href="#/nation/${n.id}">← ${n.flag} ${esc(short(n))} 이야기로</a><div id="nquiz"></div>`;
-    renderQuestion();
+    const start = () => {
+      const level = A.me().level;
+      const pool = n.quiz.filter(q => level >= 2 || q.level === 1);
+      const d = level >= 3 && window.NATION_DEEP && window.NATION_DEEP[n.id];
+      let qs;
+      if (level >= 2) {
+        // 심화 대원은 어른용 문제 4개 + 보통 문제 1개, 어른용 문제가 없으면 보통 대원과 같아요
+        const deep = shuffle((d && d.quiz) || []).slice(0, 4);
+        const hard = shuffle(pool.filter(q => q.level === 2)).slice(0, deep.length ? QUIZ_LEN - deep.length : 2);
+        const easy = shuffle(pool.filter(q => q.level === 1)).slice(0, QUIZ_LEN - deep.length - hard.length);
+        qs = shuffle(deep.concat(hard, easy));
+      } else {
+        qs = shuffle(pool).slice(0, QUIZ_LEN);
+      }
+      nq = {
+        n, i: 0, score: 0, picked: null,
+        qs: qs.map(q => q.type === 'mc'
+          ? Object.assign({}, q, { opts: shuffle(q.choices), right: q.choices[0] })
+          : Object.assign({}, q, { opts: ['O', 'X'], right: q.answer ? 'O' : 'X' })),
+      };
+      renderQuestion();
+    };
+    if (!A.grown() || (window.NATION_DEEP && window.NATION_DEEP[n.id])) { start(); return; }
+    nq = null;
+    document.getElementById('nquiz').innerHTML = '<p class="panel hint">🎓 어른용 문제를 불러오는 중…</p>';
+    const token = location.hash;
+    loadNationDeep(n.id).then(() => {
+      if (location.hash !== token || !document.getElementById('nquiz')) return;
+      start();
+    });
   }
 
   function renderQuestion() {
@@ -419,7 +453,7 @@
       </div>
       <div class="bar" role="progressbar" aria-label="진행" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${(done / total) * 100}%"></i></div>
       <section class="qcard ${answered ? '' : 'enter'}">
-        <span class="qtype">${q.type === 'ox' ? '⭕❌ OX 퀴즈' : '골라 맞히기'}</span>
+        <span class="qtype">${q.deep ? '🎓 어른용 · ' : ''}${q.type === 'ox' ? '⭕❌ OX 퀴즈' : '골라 맞히기'}</span>
         <h1 class="qtext">${esc(q.q)}</h1>
         ${A.speakBtn(readText)}
         ${options}
