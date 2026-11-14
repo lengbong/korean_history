@@ -272,6 +272,7 @@
                 </details>
               </article>`).join('')}
           </section>` : ''}
+        <div id="note-videos" data-unit="${esc(u.id)}"></div>
         ${figuresCreditNote(u)}
         <div class="cta-row">
           ${prev ? `<a class="btn btn-ghost" href="#/exam/note/${prev.id}">◀ ${esc(prev.short)}</a>` : ''}
@@ -279,6 +280,19 @@
           ${next ? `<a class="btn btn-ghost" href="#/exam/note/${next.id}">${esc(next.short)} ▶</a>` : ''}
         </div>
       </div>`;
+    fillNoteVideos(u);
+  }
+
+  // 이 단원의 강의·교양 영상 (목차에서 바로 갈 수 있게 버튼도 하나 더해요)
+  function fillNoteVideos(u) {
+    A.loadVideos().then(V => {
+      const list = V && V.exam && V.exam[u.id];
+      const box = document.getElementById('note-videos');
+      if (!box || !list || box.dataset.unit !== u.id || box.innerHTML) return;
+      box.innerHTML = A.videoPanel(A.ytGroup('', list));
+      const toc = document.querySelector('.note-toc');
+      if (toc) toc.insertAdjacentHTML('beforeend', '<button type="button" data-exam-jump="note-videos">📺 강의 영상</button>');
+    });
   }
 
   // 사진이 있는 단원에는 사진 출처 안내를 덧붙여요
