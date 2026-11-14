@@ -1,0 +1,652 @@
+[
+ {
+  "id": "card-goindol",
+  "file": "img/cards/goindol.jpg",
+  "caption": "고창 고인돌 유적 (유네스코 세계유산)",
+  "commons_title": "File:Gochang Dolmen Sites - 1.JPG",
+  "source": "https://commons.wikimedia.org/wiki/File:Gochang_Dolmen_Sites_-_1.JPG",
+  "author": "Kussy",
+  "license": "CC BY-SA 2.1 jp",
+  "license_url": "https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en"
+ },
+ {
+  "id": "card-jumong",
+  "file": "img/cards/jumong.jpg",
+  "caption": "평양의 동명왕릉 — 주몽(동명성왕)의 무덤으로 전해져요",
+  "commons_title": "File:Tomb of King Tongmyong.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Tomb_of_King_Tongmyong.jpg",
+  "author": "Sgnpkd",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+ },
+ {
+  "id": "card-gwanggaeto",
+  "file": "img/cards/gwanggaeto.jpg",
+  "caption": "광개토대왕릉비의 탁본 일부 (일본 국립 역사 민속 박물관)",
+  "commons_title": "File:Gwanggaeto stele Mizutani Rubbing05.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Gwanggaeto_stele_Mizutani_Rubbing05.jpg",
+  "author": "Tokyo National Museum",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-geunchogo",
+  "file": "img/cards/geunchogo.jpg",
+  "caption": "서울 몽촌토성 — 한성 백제 때의 흙 성",
+  "commons_title": "File:Seoul Mongchon Toseong-1.JPG",
+  "source": "https://commons.wikimedia.org/wiki/File:Seoul_Mongchon_Toseong-1.JPG",
+  "author": "Saigen Jiro",
+  "license": "CC0 (퍼블릭 도메인)",
+  "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ {
+  "id": "card-euljimundeok",
+  "file": "img/cards/euljimundeok.jpg",
+  "caption": "을지문덕 그림 (『초등대한역사』, 1908년)",
+  "commons_title": "File:초등대한역사 제2편 10.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%EC%B4%88%EB%93%B1%EB%8C%80%ED%95%9C%EC%97%AD%EC%82%AC_%EC%A0%9C2%ED%8E%B8_10.jpg",
+  "author": "정인호 (『초등대한역사』)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-seondeok",
+  "file": "img/cards/seondeok.jpg",
+  "caption": "경주 선덕여왕릉",
+  "commons_title": "File:Tombe de la reine Seondeok.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Tombe_de_la_reine_Seondeok.jpg",
+  "author": "Thelesyl",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+ },
+ {
+  "id": "card-cheomseongdae",
+  "file": "img/cards/cheomseongdae.jpg",
+  "caption": "밤에 불을 밝힌 경주 첨성대",
+  "commons_title": "File:Cheomseongdae Night Violet.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Cheomseongdae_Night_Violet.jpg",
+  "author": "Brinacor",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+ },
+ {
+  "id": "card-kimyusin",
+  "file": "img/cards/kimyusin.jpg",
+  "caption": "경주 김유신 묘",
+  "commons_title": "File:Korea-Gyeongju-Tomb of General Kim Yusin-02A.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Korea-Gyeongju-Tomb_of_General_Kim_Yusin-02A.jpg",
+  "author": "Alain Seguin from Ottawa, Canada",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-daejoyeong",
+  "file": "img/cards/daejoyeong.jpg",
+  "caption": "발해 흥륭사 석등 (중국 헤이룽장성 닝안, 상경성 터)",
+  "commons_title": "File:渤海兴隆寺千年石灯幢.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%E6%B8%A4%E6%B5%B7%E5%85%B4%E9%9A%86%E5%AF%BA%E5%8D%83%E5%B9%B4%E7%9F%B3%E7%81%AF%E5%B9%A2.jpg",
+  "author": "호고호",
+  "license": "CC0 (퍼블릭 도메인)",
+  "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ {
+  "id": "card-wonhyo",
+  "file": "img/cards/wonhyo.jpg",
+  "caption": "원효 대사 진영 (부산 범어사, 1863년)",
+  "commons_title": "File:범어사 원효대사 진영.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%EB%B2%94%EC%96%B4%EC%82%AC_%EC%9B%90%ED%9A%A8%EB%8C%80%EC%82%AC_%EC%A7%84%EC%98%81.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-jangbogo",
+  "file": "img/cards/jangbogo.jpg",
+  "caption": "청해진 모형 (완도 장보고 기념관)",
+  "commons_title": "File:Chunghaejin 02.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Chunghaejin_02.jpg",
+  "author": "Rheo1905",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-wanggeon",
+  "file": "img/cards/wanggeon.jpg",
+  "caption": "고려 태조 왕건 청동상 (10세기, 개성 현릉 출토)",
+  "commons_title": "File:WangGeon.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:WangGeon.jpg",
+  "author": "작자 미상 (고려)",
+  "license": "저작자 표시",
+  "license_url": ""
+ },
+ {
+  "id": "card-gangamchan",
+  "file": "img/cards/gangamchan.jpg",
+  "caption": "강감찬 장군 흉상 (전쟁기념관)",
+  "commons_title": "File:강감찬 장군 흉상.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%EA%B0%95%EA%B0%90%EC%B0%AC_%EC%9E%A5%EA%B5%B0_%ED%9D%89%EC%83%81.jpg",
+  "author": "전쟁기념관 (공공누리)",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0"
+ },
+ {
+  "id": "card-munikjeom",
+  "file": "img/cards/munikjeom.jpg",
+  "caption": "목화 — 문익점이 원에서 들여온 씨앗으로 기르기 시작했어요",
+  "commons_title": "File:CottonPlant.JPG",
+  "source": "https://commons.wikimedia.org/wiki/File:CottonPlant.JPG",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-yiseonggye",
+  "file": "img/cards/yiseonggye.jpg",
+  "caption": "태조 이성계 어진 (1872년에 옛 그림을 옮겨 그림, 전주 경기전)",
+  "commons_title": "File:King Taejo Yi 02.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:King_Taejo_Yi_02.jpg",
+  "author": "조중묵·박기준·백은배 외",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-sejong",
+  "file": "img/cards/sejong.jpg",
+  "caption": "서울 광화문 광장의 세종대왕 동상",
+  "commons_title": "File:Statue of King Sejong.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Statue_of_King_Sejong.jpg",
+  "author": "대한민국 정부 (Korea.net)",
+  "license": "CC BY-SA 2.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+ },
+ {
+  "id": "card-jangyeongsil",
+  "file": "img/cards/jangyeongsil.jpg",
+  "caption": "장영실 동상 (아산 천안아산역 앞)",
+  "commons_title": "File:Jang Youngsil 3.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Jang_Youngsil_3.jpg",
+  "author": "Himasaram",
+  "license": "CC BY-SA 3.0",
+  "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+ },
+ {
+  "id": "card-yisunsin",
+  "file": "img/cards/yisunsin.jpg",
+  "caption": "서울 광화문 광장의 이순신 장군 동상",
+  "commons_title": "File:Yi Sun-sin statue and 12.23 Fountain.JPG",
+  "source": "https://commons.wikimedia.org/wiki/File:Yi_Sun-sin_statue_and_12.23_Fountain.JPG",
+  "author": "Michaela den",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-saimdang",
+  "file": "img/cards/saimdang.jpg",
+  "caption": "신사임당이 그렸다고 전하는 초충도",
+  "commons_title": "File:초충도(草蟲圖, Chochungdo).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%EC%B4%88%EC%B6%A9%EB%8F%84(%E8%8D%89%E8%9F%B2%E5%9C%96,_Chochungdo).jpg",
+  "author": "신사임당(申師任堂)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-jeongyakyong",
+  "file": "img/cards/jeongyakyong.jpg",
+  "caption": "정약용 초상",
+  "commons_title": "File:Jeong Yak-yong.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Jeong_Yak-yong.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-seojaepil",
+  "file": "img/cards/seojaepil.jpg",
+  "caption": "미국에서의 서재필",
+  "commons_title": "File:미국에서의 서재필 박사.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%EB%AF%B8%EA%B5%AD%EC%97%90%EC%84%9C%EC%9D%98_%EC%84%9C%EC%9E%AC%ED%95%84_%EB%B0%95%EC%82%AC.jpg",
+  "author": "독립기념관",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-taegukgi",
+  "file": "img/cards/taegukgi.jpg",
+  "caption": "태극기",
+  "commons_title": "File:Flag of South Korea.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Korea.svg",
+  "author": "대한민국 정부",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-kimgu",
+  "file": "img/cards/kimgu.jpg",
+  "caption": "김구 (1949년)",
+  "commons_title": "File:Kim Gu in 1949 (cropped)(2).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Kim_Gu_in_1949_(cropped)(2).jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-yunbonggil",
+  "file": "img/cards/yunbonggil.jpg",
+  "caption": "윤봉길 (1932년)",
+  "commons_title": "File:尹奉吉.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:%E5%B0%B9%E5%A5%89%E5%90%89.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-hongbeomdo",
+  "file": "img/cards/hongbeomdo.jpg",
+  "caption": "홍범도 (1921년)",
+  "commons_title": "File:Hong Beom-do 1921.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Hong_Beom-do_1921.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-bangjeonghwan",
+  "file": "img/cards/bangjeonghwan.jpg",
+  "caption": "방정환",
+  "commons_title": "File:방정환.JPG",
+  "source": "https://commons.wikimedia.org/wiki/File:%EB%B0%A9%EC%A0%95%ED%99%98.JPG",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-yundongju",
+  "file": "img/cards/yundongju.jpg",
+  "caption": "윤동주",
+  "commons_title": "File:Yoon Dong-ju.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Yoon_Dong-ju.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-hodori",
+  "file": "img/cards/hodori.jpg",
+  "caption": "1988년 서울 올림픽 마스코트 호돌이 조형물",
+  "commons_title": "File:Korean-Olympic-Games-1988-mascot.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Korean-Olympic-Games-1988-mascot.jpg",
+  "author": "Figaro",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-hangang",
+  "file": "img/cards/hangang.jpg",
+  "caption": "한강과 여의도의 밤 풍경 (2010년)",
+  "commons_title": "File:Yeouido Night View 2010.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Yeouido_Night_View_2010.jpg",
+  "author": "Bryan Dorrough",
+  "license": "CC BY 2.0",
+  "license_url": "https://creativecommons.org/licenses/by/2.0"
+ },
+ {
+  "id": "card-hallyu",
+  "file": "img/cards/hallyu.jpg",
+  "caption": "미국 백악관을 찾은 방탄소년단(BTS) (2022년)",
+  "commons_title": "File:BTS during a White House press conference May 31, 2022 (cropped).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:BTS_during_a_White_House_press_conference_May_31,_2022_(cropped).jpg",
+  "author": "The White House",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-oracle",
+  "file": "img/cards/oracle.jpg",
+  "caption": "상나라 갑골 — 소뼈에 새긴 갑골 문자 (기원전 12세기)",
+  "commons_title": "File:Orakelknochen.JPG",
+  "source": "https://commons.wikimedia.org/wiki/File:Orakelknochen.JPG",
+  "author": "작자 미상 (사진: 위키미디어 공용)",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-olmec",
+  "file": "img/cards/olmec.jpg",
+  "caption": "올멕의 거대 머리 석상 (산로렌소 4호 석상)",
+  "commons_title": "File:San Lorenzo Monument 4 crop.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:San_Lorenzo_Monument_4_crop.jpg",
+  "author": "Marshall Astor (Life on the Edge)",
+  "license": "CC BY-SA 2.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+ },
+ {
+  "id": "card-socrates",
+  "file": "img/cards/socrates.jpg",
+  "caption": "소크라테스 두상 (로마 시대 대리석 조각, 루브르 박물관)",
+  "commons_title": "File:Socrates Louvre.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Socrates_Louvre.jpg",
+  "author": "작자 미상 (로마 시대)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-qinshihuang",
+  "file": "img/cards/qinshihuang.jpg",
+  "caption": "진시황 초상 (19세기 그림)",
+  "commons_title": "File:QinShiHuang19century.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:QinShiHuang19century.jpg",
+  "author": "작자 미상 (19세기)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-greatwall",
+  "file": "img/cards/greatwall.jpg",
+  "caption": "진산링 구간의 만리장성 (중국 허베이성)",
+  "commons_title": "File:The Great Wall of China at Jinshanling-edit.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:The_Great_Wall_of_China_at_Jinshanling-edit.jpg",
+  "author": "Severin.stalder",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-confucius",
+  "file": "img/cards/confucius.jpg",
+  "caption": "공자 초상 (당나라 화가 오도자의 그림으로 전해져요)",
+  "commons_title": "File:Confucius Tang Dynasty.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Confucius_Tang_Dynasty.jpg",
+  "author": "오도자 (당나라, 전함)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-aksum",
+  "file": "img/cards/aksum.jpg",
+  "caption": "악숨의 오벨리스크(돌기둥) (에티오피아 악숨)",
+  "commons_title": "File:Rome Stele.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Rome_Stele.jpg",
+  "author": "Ondřej Žváček",
+  "license": "CC BY 2.5",
+  "license_url": "https://creativecommons.org/licenses/by/2.5"
+ },
+ {
+  "id": "card-marcopolo",
+  "file": "img/cards/marcopolo.jpg",
+  "caption": "마르코 폴로 (1477년 뉘른베르크판 『동방견문록』 첫 장 판화)",
+  "commons_title": "File:Frontispice édition de Nuremberg 1477 (cropped).png",
+  "source": "https://commons.wikimedia.org/wiki/File:Frontispice_%C3%A9dition_de_Nuremberg_1477_(cropped).png",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-castle",
+  "file": "img/cards/castle.jpg",
+  "caption": "영국 보디엄성 — 물을 채운 해자로 둘러싸인 중세의 성",
+  "commons_title": "File:Bodiam-castle-10My8-1197.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Bodiam-castle-10My8-1197.jpg",
+  "author": "Antony McCallum",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-numerals",
+  "file": "img/cards/numerals.jpg",
+  "caption": "『비길라 사본』의 한 장 (976년, 에스파냐) — 인도·아라비아 숫자를 처음 소개한 유럽 책으로 꼽혀요",
+  "commons_title": "File:Codex Vigilanus, Vigila scriba, folio 22v.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Codex_Vigilanus,_Vigila_scriba,_folio_22v.jpg",
+  "author": "비길라 외 (알벨다 수도원)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-mansamusa",
+  "file": "img/cards/mansamusa.jpg",
+  "caption": "『카탈루냐 지도』 속 황금을 든 만사 무사 (1375년 무렵)",
+  "commons_title": "File:Catalan Atlas BNF Sheet 6 Mansa Musa (cropped).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Catalan_Atlas_BNF_Sheet_6_Mansa_Musa_(cropped).jpg",
+  "author": "아브라함 크레스크 (전함)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-samurai",
+  "file": "img/cards/samurai.jpg",
+  "caption": "갑옷을 입고 말을 탄 사무라이 (1878년 무렵 사진)",
+  "commons_title": "File:Samurai on horseback0.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Samurai_on_horseback0.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-davinci",
+  "file": "img/cards/davinci.jpg",
+  "caption": "레오나르도 다빈치의 자화상으로 여겨지는 붉은 분필 그림",
+  "commons_title": "File:Leonardo da Vinci - presumed self-portrait - WGA12798.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_presumed_self-portrait_-_WGA12798.jpg",
+  "author": "Leonardo da Vinci",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-columbus",
+  "file": "img/cards/columbus.jpg",
+  "caption": "콜럼버스로 전해지는 초상 (세바스티아노 델 피옴보, 1519년)",
+  "commons_title": "File:Portrait of a Man, Said to be Christopher Columbus.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Portrait_of_a_Man,_Said_to_be_Christopher_Columbus.jpg",
+  "author": "Sebastiano del Piombo",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-galileo",
+  "file": "img/cards/galileo.jpg",
+  "caption": "갈릴레이 초상 (유스투스 수스테르만스, 1636년)",
+  "commons_title": "File:Galileo Galilei (1564-1642) RMG BHC2700.tiff",
+  "source": "https://commons.wikimedia.org/wiki/File:Galileo_Galilei_(1564-1642)_RMG_BHC2700.tiff",
+  "author": "Justus Sustermans",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-newton",
+  "file": "img/cards/newton.jpg",
+  "caption": "뉴턴 초상 (고드프리 넬러, 1689년)",
+  "commons_title": "File:Portrait of Sir Isaac Newton, 1689 (brightened).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Portrait_of_Sir_Isaac_Newton,_1689_(brightened).jpg",
+  "author": "Godfrey Kneller",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-himeji",
+  "file": "img/cards/himeji.jpg",
+  "caption": "일본 히메지성 (2015년)",
+  "commons_title": "File:Himeji castle in may 2015.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Himeji_castle_in_may_2015.jpg",
+  "author": "Nikos Kitsakis",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+ },
+ {
+  "id": "card-liberty",
+  "file": "img/cards/liberty.jpg",
+  "caption": "미국 뉴욕의 자유의 여신상",
+  "commons_title": "File:Front view of Statue of Liberty (cropped).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Front_view_of_Statue_of_Liberty_(cropped).jpg",
+  "author": "AskALotl",
+  "license": "CC0 (퍼블릭 도메인)",
+  "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ {
+  "id": "card-washington",
+  "file": "img/cards/washington.jpg",
+  "caption": "조지 워싱턴 초상 (길버트 스튜어트)",
+  "commons_title": "File:Gilbert Stuart Williamstown Portrait of George Washington.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg",
+  "author": "Gilbert Stuart",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-rights",
+  "file": "img/cards/rights.jpg",
+  "caption": "「인간과 시민의 권리 선언」 (장자크 프랑수아 르 바르비에 그림, 1789년)",
+  "commons_title": "File:Declaration of the Rights of Man and of the Citizen in 1789.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Declaration_of_the_Rights_of_Man_and_of_the_Citizen_in_1789.jpg",
+  "author": "장자크 프랑수아 르 바르비에",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-bolivar",
+  "file": "img/cards/bolivar.jpg",
+  "caption": "시몬 볼리바르 초상 (1922년, 볼리비아 라파스 국회 의사당)",
+  "commons_title": "File:Simón Bolívar. Toro Moreno, Luis. 1922, Legislative Palace, La Paz.png",
+  "source": "https://commons.wikimedia.org/wiki/File:Sim%C3%B3n_Bol%C3%ADvar._Toro_Moreno,_Luis._1922,_Legislative_Palace,_La_Paz.png",
+  "author": "Luis Enrique Toro Moreno (1897-1933)",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-locomotive",
+  "file": "img/cards/locomotive.jpg",
+  "caption": "스톡턴–달링턴 철도를 처음 달린 로코모션 1호 (영국 달링턴)",
+  "commons_title": "File:Stockton & Darlington Railway 0-4-0 No. 1 'Locomotion' (1825) Head of Steam, Darlington 30.06.2009 P6300119 (10192855826).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Stockton_%26_Darlington_Railway_0-4-0_No._1_%27Locomotion%27_(1825)_Head_of_Steam,_Darlington_30.06.2009_P6300119_(10192855826).jpg",
+  "author": "Gillett's Crossing",
+  "license": "CC BY 2.0",
+  "license_url": "https://creativecommons.org/licenses/by/2.0"
+ },
+ {
+  "id": "card-watt",
+  "file": "img/cards/watt.jpg",
+  "caption": "제임스 와트 초상 (칼 프레드릭 폰 브레다, 1792년)",
+  "commons_title": "File:Watt James von Breda.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Watt_James_von_Breda.jpg",
+  "author": "Carl Frederik von Breda",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-edison",
+  "file": "img/cards/edison.jpg",
+  "caption": "토머스 에디슨 (1922년)",
+  "commons_title": "File:Thomas Edison2.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Thomas_Edison2.jpg",
+  "author": "Louis Bachrach",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-bell",
+  "file": "img/cards/bell.jpg",
+  "caption": "알렉산더 그레이엄 벨 (1895년)",
+  "commons_title": "File:Alexander Graham Bell 1895 NPG 77 363.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Alexander_Graham_Bell_1895_NPG_77_363.jpg",
+  "author": "작자 미상",
+  "license": "CC0 (퍼블릭 도메인)",
+  "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ {
+  "id": "card-wright",
+  "file": "img/cards/wright.jpg",
+  "caption": "오빌 라이트 (1905년)",
+  "commons_title": "File:Orville Wright 1905-crop.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Orville_Wright_1905-crop.jpg",
+  "author": "라이트 형제",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-curie",
+  "file": "img/cards/curie.jpg",
+  "caption": "마리 퀴리 (1920년대)",
+  "commons_title": "File:Marie Curie c. 1920s.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Marie_Curie_c._1920s.jpg",
+  "author": "Henri Manuel",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-einstein",
+  "file": "img/cards/einstein.jpg",
+  "caption": "알베르트 아인슈타인 (1947년)",
+  "commons_title": "File:Albert Einstein Head cleaned.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Albert_Einstein_Head_cleaned.jpg",
+  "author": "Oren Jack Turner",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-un",
+  "file": "img/cards/un.jpg",
+  "caption": "국제 연합(UN) 깃발",
+  "commons_title": "File:Flag of the United Nations.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Nations.svg",
+  "author": "Denelson83 외",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-armstrong",
+  "file": "img/cards/armstrong.jpg",
+  "caption": "아폴로 11호 선장 닐 암스트롱 (1969년)",
+  "commons_title": "File:Neil Armstrong pose.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Neil_Armstrong_pose.jpg",
+  "author": "작자 미상",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-berlinwall",
+  "file": "img/cards/berlinwall.jpg",
+  "caption": "베를린 장벽의 남은 부분에 그린 벽화 (이스트사이드 갤러리)",
+  "commons_title": "File:Segment with Graffiti of the Berlin Wall (3 of 4) (cropped).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Segment_with_Graffiti_of_the_Berlin_Wall_(3_of_4)_(cropped).jpg",
+  "author": "Lklundin",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+ },
+ {
+  "id": "card-internet",
+  "file": "img/cards/internet.jpg",
+  "caption": "인터넷 연결을 그린 지도 (오프트 프로젝트)",
+  "commons_title": "File:Internet map 1024 - transparent, inverted.png",
+  "source": "https://commons.wikimedia.org/wiki/File:Internet_map_1024_-_transparent,_inverted.png",
+  "author": "The Opte Project",
+  "license": "CC BY 2.5",
+  "license_url": "https://creativecommons.org/licenses/by/2.5"
+ },
+ {
+  "id": "card-mandela",
+  "file": "img/cards/mandela.jpg",
+  "caption": "넬슨 만델라 (1994년)",
+  "commons_title": "File:Nelson Mandela 1994.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Nelson_Mandela_1994.jpg",
+  "author": "Kingkongphoto & celebrity-photos.com",
+  "license": "CC BY-SA 2.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+ },
+ {
+  "id": "card-mlk",
+  "file": "img/cards/mlk.jpg",
+  "caption": "마틴 루서 킹 (1966년)",
+  "commons_title": "File:Martin Luther King, Jr. and Lyndon Johnson (cropped).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Martin_Luther_King,_Jr._and_Lyndon_Johnson_(cropped).jpg",
+  "author": "Yoichi Okamoto",
+  "license": "퍼블릭 도메인",
+  "license_url": ""
+ },
+ {
+  "id": "card-shinkansen",
+  "file": "img/cards/shinkansen.jpg",
+  "caption": "신칸센 0계 열차",
+  "commons_title": "File:Shinkansen Series0 R67 JNRcolor.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Shinkansen_Series0_R67_JNRcolor.jpg",
+  "author": "ナダテ at Japanese Wikipedia (Nadate)",
+  "license": "CC BY 3.0",
+  "license_url": "https://creativecommons.org/licenses/by/3.0"
+ }
+]
