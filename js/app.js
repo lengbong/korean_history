@@ -258,6 +258,33 @@
     ? `<button class="speak" type="button" data-speak="${esc(text)}">🔊 읽어 줘</button>`
     : '';
 
+  // ---------- 사진 (js/era-images.js) ----------
+  // 시대 이야기 슬라이드마다 2~3장, 카드마다 1장의 사진을 보여 줘요. 사진 파일이 없으면 예전처럼 이모지·그림만 나와요.
+  const PHOTOS = typeof ERA_PHOTOS !== 'undefined' ? Object.fromEntries(ERA_PHOTOS.map(m => [m.id, m])) : {};
+  const slidePhotos = (eraId, idx) => {
+    const list = typeof SLIDE_PHOTOS !== 'undefined' && SLIDE_PHOTOS[eraId] && SLIDE_PHOTOS[eraId][idx];
+    return (list || []).map(id => PHOTOS[id]).filter(Boolean);
+  };
+  const cardPhoto = c => (typeof CARD_PHOTOS !== 'undefined' && PHOTOS[CARD_PHOTOS[c.id]]) || null;
+  const photoLink = (href, text) => href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(text)}</a>` : esc(text);
+  const photoCredit = m => `사진: ${esc(m.author)} · ${photoLink(m.license_url, m.license)} · ${photoLink(m.source, '위키미디어 공용')}`;
+  // 누르면 크게 보이는 사진 한 장 (cls로 크기와 자리를 정해요)
+  const photoFig = (m, cls) => `<figure class="${cls}">
+      <button type="button" class="photo-zoom" data-photo="${esc(m.id)}" aria-label="${esc(m.caption)} 크게 보기">
+        <img src="${esc(m.file)}" alt="${esc(m.caption)}" decoding="async">
+      </button>
+      <figcaption>${esc(m.caption)}</figcaption>
+    </figure>`;
+  function showPhoto(id) {
+    const m = PHOTOS[id];
+    if (!m) return;
+    openModal(`<figure class="zoom-fig"><img src="${esc(m.file)}" alt="${esc(m.caption)}"><figcaption><b>${esc(m.caption)}</b><small>${photoCredit(m)}</small></figcaption></figure>`, m.caption);
+  }
+  // 다음 슬라이드의 사진을 미리 받아 두면 넘길 때 덜 기다려요
+  function preloadPhotos(list) {
+    list.forEach(m => { const im = new Image(); im.decoding = 'async'; im.src = m.file; });
+  }
+
   // ---------- 꽃가루 ----------
   function confetti(n = 60) {
     if (reduceMotion) return;
@@ -322,8 +349,12 @@
       return `<button class="ctile locked" type="button" data-card="${c.id}" style="--era:${era.color}" aria-label="아직 못 모은 ${esc(era.short)} 카드">
         <span class="ctile-art" aria-hidden="true">❔</span><span class="ctile-name">???</span><span class="ctile-era">${esc(era.short)}</span></button>`;
     }
-    return `<button class="ctile" type="button" data-card="${c.id}" style="--era:${era.color}">
-      <span class="ctile-art">${art(c)}</span><span class="ctile-name">${esc(c.name)}</span><span class="ctile-era">${esc(era.short)}</span></button>`;
+    const ph = cardPhoto(c);
+    const pic = ph
+      ? `<span class="ctile-art ctile-photo"><img src="${esc(ph.file)}" alt="" loading="lazy" decoding="async"></span>`
+      : `<span class="ctile-art">${art(c)}</span>`;
+    return `<button class="ctile${ph ? ' has-photo' : ''}" type="button" data-card="${c.id}" style="--era:${era.color}">
+      ${pic}<span class="ctile-name">${esc(c.name)}</span><span class="ctile-era">${esc(era.short)}</span></button>`;
   }
 
   function bigCard(c) {
@@ -331,7 +362,9 @@
     const track = TRACKS[era.track];
     return `<article class="bigcard" style="--era:${era.color}">
       <div class="bigcard-top"><span class="badge">${track.icon} ${track.name}</span><span class="badge">${TYPE_NAMES[c.type]}</span><span class="badge">${era.emoji} ${esc(era.short)}</span></div>
-      <div class="bigcard-art">${art(c)}</div>
+      ${(ph => ph
+        ? `<figure class="bigcard-photo"><img src="${esc(ph.file)}" alt="${esc(ph.caption)}" decoding="async"><figcaption>${esc(ph.caption)}<small>${photoCredit(ph)}</small></figcaption></figure>`
+        : `<div class="bigcard-art">${art(c)}</div>`)(cardPhoto(c))}
       <h2 class="bigcard-name">${esc(c.name)}</h2>
       <p class="bigcard-nick">“${esc(c.nick)}”</p>
       <p class="bigcard-desc">${esc(c.desc)}</p>
@@ -642,11 +675,21 @@
         });
       } else if (ds) {
         const body = ds.deep.join('');
+        // 긴 글 사이사이에 사진을 끼워 넣어요: 첫 장은 글 앞, 나머지는 글을 고르게 나눈 자리에
+        const pics = slidePhotos(e.id, idx);
+        const n = ds.deep.length;
+        const at = pics.map((_, k) => k === 0 ? 0 : Math.min(n, Math.round((n * k) / pics.length)));
+        const paras = [];
+        ds.deep.forEach((t, i) => {
+          pics.forEach((m, k) => { if (at[k] === i) paras.push(photoFig(m, 'deep-fig')); });
+          paras.push(`<p>${esc(t)}</p>`);
+        });
+        pics.forEach((m, k) => { if (at[k] >= n) paras.push(photoFig(m, 'deep-fig')); });
         slide = `<article class="slide deep" style="--era:${e.color}">
           <p class="deep-kicker">🎓 어른용 이야기 · ${idx + 1} / ${e.slides.length} · 약 ${readMin(body)}분</p>
           <h2 class="slide-title">${esc(s.title)}</h2>
           ${ds.lead ? `<p class="deep-lead">${esc(ds.lead)}</p>` : ''}
-          <div class="deep-body">${ds.deep.map(t => `<p>${esc(t)}</p>`).join('')}</div>
+          <div class="deep-body">${paras.join('')}</div>
           ${speakBtn(`${s.title}. ${ds.deep.join(' ')}`)}
         </article>`;
       } else {
@@ -656,9 +699,16 @@
     if (mode !== 'deep') {
       const text = mode === 'easy' ? s.easy : s.normal;
       const note = storyMode() === 'deep' ? '<p class="hint">이 슬라이드의 어른용 이야기를 불러오지 못해 자세한 이야기로 보여 드려요. 인터넷 연결을 확인한 뒤 다시 열어 주세요.</p>' : '';
-      slide = `<div class="slide" style="--era:${e.color}">
-        <div class="slide-emoji" aria-hidden="true">${s.emoji}</div>
-        <h2 class="slide-title">${esc(s.title)}</h2>
+      // 사진이 있으면 큰 사진 1장과 작은 사진 1~2장을 이야기 위에 보여 줘요
+      const [main, ...subs] = slidePhotos(e.id, idx);
+      const gallery = main ? `<div class="slide-photos${subs.length ? '' : ' single'}">
+          ${photoFig(main, 'sp-main')}
+          ${subs.length ? `<div class="sp-subs">${subs.map(m => photoFig(m, 'sp-sub')).join('')}</div>` : ''}
+        </div>` : '';
+      slide = `<div class="slide${main ? ' has-photos' : ''}" style="--era:${e.color}">
+        ${main
+          ? `<h2 class="slide-title"><span class="slide-emoji-inline" aria-hidden="true">${s.emoji}</span> ${esc(s.title)}</h2>${gallery}`
+          : `<div class="slide-emoji" aria-hidden="true">${s.emoji}</div><h2 class="slide-title">${esc(s.title)}</h2>`}
         <p class="slide-text">${esc(text)}</p>
         ${note}
         ${speakBtn(`${s.title}. ${text}`)}
@@ -672,6 +722,7 @@
       </div>`;
     if (focusNext) box.querySelector('[data-action="slide-next"]').focus({ preventScroll: true });
     renderSlideVideos();
+    preloadPhotos(slidePhotos(e.id, idx + 1));
   }
 
   // 시대 영상: 지금 슬라이드 주제 영상 + 시대 전체 영상 (재생 중인 영상은 슬라이드를 넘겨도 그대로)
@@ -1251,6 +1302,9 @@
 
     const speakEl = t.closest('[data-speak]');
     if (speakEl) { speak(speakEl.dataset.speak); return; }
+
+    const photoEl = t.closest('[data-photo]');
+    if (photoEl) { showPhoto(photoEl.dataset.photo); sfx.tap(); return; }
 
     // 지금 보고 있는 주소를 다시 누르면 화면을 새로 그려요 (예: 새 문제)
     const link = t.closest('a[href^="#/"]');
