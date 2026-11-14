@@ -1250,3 +1250,341 @@ body.grown .bubble h1 { font-size: clamp(1.4rem, 4vw, 1.8rem); }
 .yt-meta small { color: var(--muted); font-size: 0.82rem; }
 .yt-en { display: inline-block; padding: 0 6px; border-radius: 6px; background: #eef5ff; color: var(--blue); }
 @media (max-width: 380px) { .yt-thumb { width: 112px; } }
+
+/* ---------- ⚙️ 설정 창 ---------- */
+.settings h2 { margin-bottom: 12px; }
+.set-row { margin: 0 0 16px; }
+.set-row h3 { font-size: 1.05rem; margin: 0 0 6px; }
+.set-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.set-opts button {
+  flex: 1 1 auto; min-height: 44px; padding: 6px 12px; cursor: pointer;
+  border-radius: 12px; border: 2px solid var(--line); background: var(--paper-2);
+  font-family: var(--font-display); font-size: 1rem; color: var(--ink);
+}
+.set-opts button:hover { border-color: var(--yellow); }
+.set-opts button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.set-sample {
+  margin: 8px 0 0; padding: 8px 12px; border-radius: 12px; background: var(--paper-2); border: 2px dashed var(--line);
+  font-family: var(--font-serif); line-height: 1.8;
+}
+.settings .row-gap { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings .btn { min-height: 44px; }
+
+/* ---------- 🔎 글자 크기: --rs(1 ~ 1.35)만큼 본문 글자를 키워요 ---------- */
+html { font-size: calc(100% * var(--rs, 1)); }
+body { font-size: 1.0625rem; }
+/* 위쪽 머리글과 탭 막대는 자리가 좁아서 크기를 그대로 둬요 */
+.topbar { --u: calc(1rem / var(--rs, 1)); }
+.logo { font-size: calc(1.25 * var(--u)); }
+.logo-icon { font-size: calc(1.8 * var(--u)); }
+.hud-player, .hud-stat, .hud-sound { font-size: var(--u); }
+.hud-avatar { font-size: calc(1.3 * var(--u)); }
+.hud-sound { font-size: calc(1.15 * var(--u)); }
+.tabs a { font-size: calc(1.05 * var(--u)); }
+.tabs a span { font-size: calc(1.25 * var(--u)); }
+@media (max-width: 719px) {
+  .logo { font-size: calc(1.05 * var(--u)); }
+  .logo-icon { font-size: calc(1.5 * var(--u)); }
+  .tabs a { font-size: calc(0.85 * var(--u)); }
+  .tabs a span { font-size: calc(1.35 * var(--u)); }
+}
+
+/* 글자가 커져도 화면 밖으로 밀려나지 않게 */
+.exam-banner-text, .nation-banner-text, .compare-list li > div, .yt-meta { min-width: 0; }
+.chip-link { white-space: normal; }
+.yt-list > li { min-width: 0; }
+@media (max-width: 719px) { .yt-list { grid-template-columns: minmax(0, 1fr); } }
+
+/* DARK-AUTO-START — tools/build-dark.js가 만든 구역이에요. 손으로 고치지 마세요. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #171310;
+  --paper: #231e1a;
+  --paper-2: #2b2520;
+  --ink: #efe6dc;
+  --muted: #b5a798;
+  --line: #40362d;
+  --good-bg: #17301f;
+  --bad-bg: #3a1d1d;
+  --shadow: 0 4px 0 rgba(0, 0, 0, 0.28), 0 10px 24px rgba(0, 0, 0, 0.38);
+}
+:where(:root[data-theme="dark"]) body { background-color: var(--bg); background-image: radial-gradient(rgba(224, 72, 72, 0.07) 1.6px, transparent 1.8px); color: var(--ink); }
+:where(:root[data-theme="dark"]) a { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) button { color: inherit; }
+:where(:root[data-theme="dark"]) .topbar { background: var(--paper); }
+:where(:root[data-theme="dark"]) .logo { color: var(--ink); }
+:where(:root[data-theme="dark"]) .logo b { color: color-mix(in srgb, var(--red) 62%, white); }
+:where(:root[data-theme="dark"]) .hud-player, :where(:root[data-theme="dark"]) .hud-stat, :where(:root[data-theme="dark"]) .hud-sound { background: var(--paper-2); color: var(--ink); }
+:where(:root[data-theme="dark"]) .tabs a { color: var(--muted); }
+:where(:root[data-theme="dark"]) .tabs a:hover { background: var(--paper-2); color: var(--ink); }
+:where(:root[data-theme="dark"]) .tabs a[aria-current="page"] { background: #342c1c; color: var(--ink); }
+@media (max-width: 719px) {
+  :where(:root[data-theme="dark"]) .tabs { background: var(--paper); }
+}
+:where(:root[data-theme="dark"]) .panel { background: var(--paper); }
+:where(:root[data-theme="dark"]) .page-head p { color: var(--muted); }
+:where(:root[data-theme="dark"]) .hint { color: var(--muted); }
+:where(:root[data-theme="dark"]) .back { color: var(--muted); }
+:where(:root[data-theme="dark"]) .back:hover { color: var(--ink); }
+:where(:root[data-theme="dark"]) .seg { background: var(--paper); }
+:where(:root[data-theme="dark"]) .seg a { color: var(--muted); }
+:where(:root[data-theme="dark"]) .seg a:hover { color: var(--ink); background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .seg a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+:where(:root[data-theme="dark"]) .btn { color: #fff; background: var(--blue); }
+:where(:root[data-theme="dark"]) .btn-blue { background: var(--blue); }
+:where(:root[data-theme="dark"]) .btn-green { background: var(--green); }
+:where(:root[data-theme="dark"]) .btn-red { background: var(--red); }
+:where(:root[data-theme="dark"]) .btn-ghost { background: var(--paper); color: var(--ink); }
+:where(:root[data-theme="dark"]) .speak { background: #342d1c; border: 2px solid #453d29; color: #ebdfbb; }
+:where(:root[data-theme="dark"]) .speak:hover { background: #3f3722; }
+:where(:root[data-theme="dark"]) .chip { background: color-mix(in srgb, var(--era, var(--blue)) 14%, var(--paper)); color: color-mix(in srgb, var(--era, var(--blue)) 60%, white); border: 1.5px solid color-mix(in srgb, var(--era, var(--blue)) 35%, var(--paper)); }
+:where(:root[data-theme="dark"]) .bar { background: #312c24; }
+:where(:root[data-theme="dark"]) .bar i { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+:where(:root[data-theme="dark"]) .mascot { background: #3d3321; border: 4px solid var(--paper); }
+:where(:root[data-theme="dark"]) .bubble { background: var(--paper); }
+:where(:root[data-theme="dark"]) .menu-tile { color: #fff; background: var(--tile); }
+:where(:root[data-theme="dark"]) .stat { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .stat-label { color: var(--muted); }
+:where(:root[data-theme="dark"]) .road::before { background: repeating-linear-gradient(180deg, #3c362c 0 14px, transparent 14px 24px); }
+:where(:root[data-theme="dark"]) .stop-link { background: var(--paper); color: var(--ink); }
+:where(:root[data-theme="dark"]) .stop-dot { background: color-mix(in srgb, var(--era) 16%, var(--paper)); }
+:where(:root[data-theme="dark"]) .stop-no { color: var(--muted); }
+:where(:root[data-theme="dark"]) .stop-name { color: color-mix(in srgb, var(--era) 55%, white); }
+:where(:root[data-theme="dark"]) .stop-period { color: var(--muted); }
+:where(:root[data-theme="dark"]) .here { background: var(--red); color: #fff; }
+:where(:root[data-theme="dark"]) .era-banner { color: #fff; background: linear-gradient(135deg, var(--era), color-mix(in srgb, var(--era) 70%, black)); }
+:where(:root[data-theme="dark"]) .compare-list li { background: #18212d; }
+:where(:root[data-theme="dark"]) .compare.world .compare-list li { background: #322a1b; }
+:where(:root[data-theme="dark"]) .era-emoji { background: rgba(255, 255, 255, 0.92); }
+:where(:root[data-theme="dark"]) .slide { background: var(--paper); border: 3px solid color-mix(in srgb, var(--era) 40%, var(--paper)); }
+:where(:root[data-theme="dark"]) .slide-title { color: color-mix(in srgb, var(--era) 55%, white); }
+:where(:root[data-theme="dark"]) .dots i { background: #39342d; }
+:where(:root[data-theme="dark"]) .dots i.on { background: var(--orange); }
+:where(:root[data-theme="dark"]) .word { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .word[aria-pressed="true"] { background: #342d1c; }
+:where(:root[data-theme="dark"]) .fact { background: #302a1a; }
+:where(:root[data-theme="dark"]) .ctile { background: linear-gradient(180deg, color-mix(in srgb, var(--era) 14%, var(--paper)), var(--paper) 70%); }
+:where(:root[data-theme="dark"]) .ctile-era { color: var(--muted); }
+:where(:root[data-theme="dark"]) .ctile.locked { background: repeating-linear-gradient(45deg, #302d27 0 10px, #34312c 10px 20px); border-color: #776d5b; color: #8d8273; }
+:where(:root[data-theme="dark"]) .filter { background: var(--paper); color: var(--muted); }
+:where(:root[data-theme="dark"]) .filter.on { background: var(--ink); color: var(--paper); }
+:where(:root[data-theme="dark"]) .bigcard { background: linear-gradient(180deg, color-mix(in srgb, var(--era) 18%, var(--paper)), var(--paper) 45%); }
+:where(:root[data-theme="dark"]) .badge { background: var(--paper); border: 2px solid color-mix(in srgb, var(--era) 40%, var(--paper)); }
+:where(:root[data-theme="dark"]) .bigcard-name { color: color-mix(in srgb, var(--era) 55%, white); }
+:where(:root[data-theme="dark"]) .bigcard-nick { color: var(--muted); }
+:where(:root[data-theme="dark"]) .bigcard-fact { background: #302a1a; }
+:where(:root[data-theme="dark"]) .mix-btn { color: #fff; background: linear-gradient(135deg, #8a5cc7, #e0457b); }
+:where(:root[data-theme="dark"]) .era-tile { color: var(--ink); background: var(--paper); border: 3px solid color-mix(in srgb, var(--era) 45%, var(--paper)); }
+:where(:root[data-theme="dark"]) .era-tile-name { color: color-mix(in srgb, var(--era) 55%, white); }
+:where(:root[data-theme="dark"]) .era-tile-best { color: var(--muted); }
+:where(:root[data-theme="dark"]) .qcard { background: var(--paper); }
+:where(:root[data-theme="dark"]) .qtype { background: #181e2d; color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .ox-btn { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .ox-btn.o:hover:not([disabled]) { border-color: #2859a0; }
+:where(:root[data-theme="dark"]) .ox-btn.x:hover:not([disabled]) { border-color: #492727; }
+:where(:root[data-theme="dark"]) .choice { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .choice:hover:not([disabled]) { border-color: #3d619d; }
+:where(:root[data-theme="dark"]) .choice-no { background: #181e2d; color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .right { background: var(--good-bg) !important; }
+:where(:root[data-theme="dark"]) .wrong { background: var(--bad-bg) !important; }
+:where(:root[data-theme="dark"]) .feedback.good { background: var(--good-bg); border-color: #4d8266; }
+:where(:root[data-theme="dark"]) .feedback.bad { background: var(--bad-bg); border-color: #3e2929; }
+:where(:root[data-theme="dark"]) .slot { border: 3px dashed #3e3830; background: rgba(255, 255, 255, 0.6); }
+:where(:root[data-theme="dark"]) .slot.filled { background: var(--paper); }
+:where(:root[data-theme="dark"]) .slot.right { background: var(--good-bg); }
+:where(:root[data-theme="dark"]) .slot.wrong { background: var(--bad-bg); }
+:where(:root[data-theme="dark"]) .slot-no { background: var(--yellow); color: #5a3d00; }
+:where(:root[data-theme="dark"]) .slot-empty { color: #b3a28a; }
+:where(:root[data-theme="dark"]) .slot .event { background: transparent; }
+:where(:root[data-theme="dark"]) .when { color: var(--ink); background: var(--paper); }
+:where(:root[data-theme="dark"]) .event { background: var(--paper); }
+:where(:root[data-theme="dark"]) .event[disabled] { color: var(--ink); }
+:where(:root[data-theme="dark"]) .player { background: var(--paper); }
+:where(:root[data-theme="dark"]) .player-main { background: transparent; }
+:where(:root[data-theme="dark"]) .player-info small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .now { background: var(--yellow); color: #5a3d00; }
+:where(:root[data-theme="dark"]) .mini { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .mini.danger { color: color-mix(in srgb, var(--bad) 62%, white); }
+:where(:root[data-theme="dark"]) .field input[type="text"], :where(:root[data-theme="dark"]) .field input:not([type]) { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .avatar-opt span { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .avatar-opt input:checked + span { background: #342d1c; }
+:where(:root[data-theme="dark"]) .level-opt span { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .level-opt small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .level-opt input:checked + span { background: var(--good-bg); }
+:where(:root[data-theme="dark"]) .level-opt input[value="3"]:checked + span { background: #181e2d; }
+:where(:root[data-theme="dark"]) .modal { background: rgba(40, 30, 20, 0.55); }
+:where(:root[data-theme="dark"]) .modal-box { background: var(--paper); }
+:where(:root[data-theme="dark"]) .modal-x { background: var(--paper); }
+:where(:root[data-theme="dark"]) .stamp { color: var(--era); background: color-mix(in srgb, var(--era) 10%, var(--paper)); }
+:where(:root[data-theme="dark"]) .footer { color: var(--muted); }
+:where(:root[data-theme="dark"]) .exam-banner { color: #fff; background: linear-gradient(135deg, #1f3b73, #3c6fd1); }
+:where(:root[data-theme="dark"]) .exam-big { color: #fff; }
+:where(:root[data-theme="dark"]) .exam-big.mock { background: linear-gradient(135deg, #1f3b73, #3c6fd1); }
+:where(:root[data-theme="dark"]) .exam-big.wrongnote { background: linear-gradient(135deg, #a32c2c, #e04848); }
+:where(:root[data-theme="dark"]) .exam-big.mix { background: linear-gradient(135deg, #1f6f5c, #2a9a63); }
+:where(:root[data-theme="dark"]) .exam-big.flash { background: linear-gradient(135deg, #6a3fa0, #8a5cc7); }
+:where(:root[data-theme="dark"]) .unit-item { background: var(--paper); }
+:where(:root[data-theme="dark"]) .unit-info small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .unit-btns .mini, :where(:root[data-theme="dark"]) .unit-result .mini { color: var(--ink); }
+:where(:root[data-theme="dark"]) .exam-unit-head { color: #fff; background: linear-gradient(135deg, var(--era), color-mix(in srgb, var(--era) 65%, black)); }
+:where(:root[data-theme="dark"]) .note b { color: color-mix(in srgb, var(--era) 55%, white); background: linear-gradient(transparent 62%, #413c23 62%); }
+:where(:root[data-theme="dark"]) .ntable thead th { background: #2d2921; }
+:where(:root[data-theme="dark"]) .ntable tbody th { background: #29251d; }
+:where(:root[data-theme="dark"]) .exam-q { background: var(--paper); }
+:where(:root[data-theme="dark"]) .exam-point { color: var(--muted); }
+:where(:root[data-theme="dark"]) .exam-no { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .exam-src { background: #2a2817; }
+:where(:root[data-theme="dark"]) .exam-opt { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .exam-opt:hover:not([disabled]) { border-color: #3d619d; }
+:where(:root[data-theme="dark"]) .exam-opt.chosen { background: #181e2d; }
+:where(:root[data-theme="dark"]) .why { color: var(--muted); }
+:where(:root[data-theme="dark"]) .why.ok { color: color-mix(in srgb, var(--good) 62%, white); }
+:where(:root[data-theme="dark"]) .mock-bar { background: #1f3b73; color: #fff; }
+:where(:root[data-theme="dark"]) .mock-bar b { color: var(--yellow); }
+:where(:root[data-theme="dark"]) .mock-timer.hurry { color: #ffb3b3; }
+:where(:root[data-theme="dark"]) .mock-bar .mini { background: var(--paper); color: var(--ink); }
+:where(:root[data-theme="dark"]) .omr-grid button { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .omr-grid button small { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .omr-grid button.done { background: #1c232e; border-color: #3d619d; }
+:where(:root[data-theme="dark"]) .grade-badge { background: var(--good-bg); color: color-mix(in srgb, var(--good) 62%, white); border: 2px solid #4d8266; }
+:where(:root[data-theme="dark"]) .grade-badge.fail { background: var(--bad-bg); color: color-mix(in srgb, var(--bad) 62%, white); border-color: #3e2929; }
+:where(:root[data-theme="dark"]) .unit-result .bar i { background: var(--era); }
+:where(:root[data-theme="dark"]) .review { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .deck { color: var(--ink); background: var(--paper); }
+:where(:root[data-theme="dark"]) .deck small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .deck-hard { background: var(--bad-bg); }
+:where(:root[data-theme="dark"]) .flash-card { background: none; }
+:where(:root[data-theme="dark"]) .flash-face { background: var(--paper); }
+:where(:root[data-theme="dark"]) .flash-face.back { background: color-mix(in srgb, var(--era) 10%, var(--paper)); }
+:where(:root[data-theme="dark"]) .flash-face small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .flash-face b { color: var(--ink); }
+:where(:root[data-theme="dark"]) .flash-face em { color: var(--muted); }
+:where(:root[data-theme="dark"]) .note-toc button { background: var(--paper); color: var(--muted); }
+:where(:root[data-theme="dark"]) .note-toc button:hover { color: var(--ink); }
+:where(:root[data-theme="dark"]) .note-label { color: color-mix(in srgb, var(--era) 55%, white); }
+:where(:root[data-theme="dark"]) .note-story { background: #2b261d; }
+:where(:root[data-theme="dark"]) .note-story b { background: linear-gradient(transparent 62%, #413c23 62%); }
+:where(:root[data-theme="dark"]) .note-tip { background: #312b1a; border: 2px dashed #8b742f; }
+:where(:root[data-theme="dark"]) .note-tip .note-label { color: #ead9b7; }
+:where(:root[data-theme="dark"]) .note-terms { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .note-terms dd { color: var(--muted); }
+:where(:root[data-theme="dark"]) .note-fig { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .note-zoom { background: #2c2923; }
+:where(:root[data-theme="dark"]) .note-fig figcaption b { background: none; color: var(--ink); }
+:where(:root[data-theme="dark"]) .note-fig small, :where(:root[data-theme="dark"]) .zoom-fig small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .note-fig small a, :where(:root[data-theme="dark"]) .zoom-fig small a { color: inherit; }
+:where(:root[data-theme="dark"]) .zoom-fig img { background: #2c2923; }
+:where(:root[data-theme="dark"]) .src-from { color: var(--muted); }
+:where(:root[data-theme="dark"]) .source-ans { border: 2px solid #202835; background: #171e2b; }
+:where(:root[data-theme="dark"]) .source-ans summary { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .nation-banner { color: #fff; background: linear-gradient(135deg, #12706e, #1f8a8a 55%, #2aa38a); }
+:where(:root[data-theme="dark"]) .passport { background: linear-gradient(180deg, #2a2617, #30291a); }
+:where(:root[data-theme="dark"]) .pstamp { background: #2f2b22; border: 3px dashed #3c372f; }
+:where(:root[data-theme="dark"]) .pstamp.on { background: var(--paper); }
+:where(:root[data-theme="dark"]) .region-h { color: color-mix(in srgb, var(--rc) 60%, white); }
+:where(:root[data-theme="dark"]) .ntile { color: var(--ink); background: var(--paper); }
+:where(:root[data-theme="dark"]) .ntile-photo { background: color-mix(in srgb, var(--nc) 22%, var(--paper)); }
+:where(:root[data-theme="dark"]) .ntile-flag { background: var(--paper); }
+:where(:root[data-theme="dark"]) .ntile-name { color: color-mix(in srgb, var(--nc) 55%, white); }
+:where(:root[data-theme="dark"]) .ntile-tag { color: var(--ink); }
+:where(:root[data-theme="dark"]) .ntile-meta { color: var(--muted); }
+:where(:root[data-theme="dark"]) .ntile-bar i { background: var(--nc); }
+:where(:root[data-theme="dark"]) .nation-hero { background: linear-gradient(135deg, var(--nc), color-mix(in srgb, var(--nc) 60%, black)); }
+:where(:root[data-theme="dark"]) .nation-hero-img { background: none; }
+:where(:root[data-theme="dark"]) .nation-hero-text { color: #fff; background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.62) 45%, rgba(0, 0, 0, 0.78)); }
+:where(:root[data-theme="dark"]) .hero-credit { color: var(--muted); }
+:where(:root[data-theme="dark"]) .hero-credit a { color: inherit; }
+:where(:root[data-theme="dark"]) .nation-progress { color: var(--muted); }
+:where(:root[data-theme="dark"]) .ep-item { color: var(--ink); background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .ep-item.read { background: #1e2721; }
+:where(:root[data-theme="dark"]) .ep-thumb { background: color-mix(in srgb, var(--nc) 20%, var(--paper)); }
+:where(:root[data-theme="dark"]) .ep-no { background: var(--nc); color: #fff; }
+:where(:root[data-theme="dark"]) .ep-period { color: var(--muted); }
+:where(:root[data-theme="dark"]) .ep-title { color: color-mix(in srgb, var(--nc) 50%, white); }
+:where(:root[data-theme="dark"]) .ep-hook { color: var(--ink); }
+:where(:root[data-theme="dark"]) .ep-check { color: var(--muted); }
+:where(:root[data-theme="dark"]) .ntimeline::before { background: color-mix(in srgb, var(--nc) 30%, var(--paper)); }
+:where(:root[data-theme="dark"]) .ntimeline li::before { background: var(--paper); }
+:where(:root[data-theme="dark"]) .nt-when { color: color-mix(in srgb, var(--nc) 55%, white); }
+:where(:root[data-theme="dark"]) .nstory { background: var(--paper); }
+:where(:root[data-theme="dark"]) .nstory-head h1 { color: color-mix(in srgb, var(--nc) 50%, white); }
+:where(:root[data-theme="dark"]) .nstory-kicker { color: var(--muted); }
+:where(:root[data-theme="dark"]) .nstory-period { color: var(--muted); }
+:where(:root[data-theme="dark"]) .nstory-hook p { background: color-mix(in srgb, var(--nc) 10%, var(--paper)); border: 2px solid color-mix(in srgb, var(--nc) 35%, var(--paper)); }
+:where(:root[data-theme="dark"]) .nstory-hook b { color: color-mix(in srgb, var(--nc) 55%, white); }
+:where(:root[data-theme="dark"]) .nstory-fig { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .nstory-fig small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .nstory-fig small a { color: inherit; }
+:where(:root[data-theme="dark"]) .story-mode { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .story-mode button { background: none; color: var(--muted); }
+:where(:root[data-theme="dark"]) .story-mode button:hover { color: var(--ink); background: var(--paper); }
+:where(:root[data-theme="dark"]) .story-mode button[aria-pressed="true"] { background: var(--nc); color: #fff; }
+:where(:root[data-theme="dark"]) .nstory-text.deep .deep-meta { color: var(--muted); }
+:where(:root[data-theme="dark"]) .nbox.twist { background: #2d1e18; }
+:where(:root[data-theme="dark"]) .nbox.today { background: #18212d; }
+:where(:root[data-theme="dark"]) .nbox.korea { background: #202b25; }
+:where(:root[data-theme="dark"]) .read-mark { color: color-mix(in srgb, var(--good) 62%, white); }
+:where(:root[data-theme="dark"]) .exam-big.dict { background: linear-gradient(135deg, #8a4b14, #d9822b); }
+:where(:root[data-theme="dark"]) .term { color: color-mix(in srgb, var(--era, var(--blue)) 57%, white); background: linear-gradient(transparent 62%, #413c23 62%); }
+:where(:root[data-theme="dark"]) .term:hover { background: color-mix(in srgb, var(--era, var(--blue)) 16%, #413c23); }
+:where(:root[data-theme="dark"]) .term-help { color: var(--muted); }
+:where(:root[data-theme="dark"]) .term-help a { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .term-sample { color: var(--ink); background: linear-gradient(transparent 62%, #413c23 62%); }
+:where(:root[data-theme="dark"]) .dict-when { color: var(--muted); }
+:where(:root[data-theme="dark"]) .dict-title { color: color-mix(in srgb, var(--era) 60%, white); }
+:where(:root[data-theme="dark"]) .dict-sum { background: color-mix(in srgb, var(--era) 9%, var(--paper)); border: 2px solid color-mix(in srgb, var(--era) 25%, var(--paper)); }
+:where(:root[data-theme="dark"]) .dict-pop b { color: color-mix(in srgb, var(--era) 55%, white); }
+:where(:root[data-theme="dark"]) .dict-fig { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .dict-fig img { background: #2c2923; }
+:where(:root[data-theme="dark"]) .dict-fig figcaption b { color: var(--ink); }
+:where(:root[data-theme="dark"]) .dict-fig small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .dict-fig small a { color: inherit; }
+:where(:root[data-theme="dark"]) .dict-flash li { background: #20182c; border: 2px solid #272132; }
+:where(:root[data-theme="dark"]) .dict-flash b { color: #cbb8e4; }
+:where(:root[data-theme="dark"]) .dict-flash span { color: var(--muted); }
+:where(:root[data-theme="dark"]) .dict-back { background: var(--paper-2); color: var(--muted); }
+:where(:root[data-theme="dark"]) .dict-back:hover { color: var(--ink); }
+:where(:root[data-theme="dark"]) .dict-search { background: var(--paper); }
+:where(:root[data-theme="dark"]) .dict-search input { background: transparent; color: var(--ink); }
+:where(:root[data-theme="dark"]) .dict-units button[aria-pressed="true"] { background: var(--era, var(--blue)); color: #fff; }
+:where(:root[data-theme="dark"]) .dict-group h2 { color: color-mix(in srgb, var(--era) 60%, white); }
+:where(:root[data-theme="dark"]) .dict-item { background: var(--paper-2); color: var(--ink); }
+:where(:root[data-theme="dark"]) .dict-item-head b { color: color-mix(in srgb, var(--era) 60%, white); }
+:where(:root[data-theme="dark"]) .dict-item-head small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .dict-item-sum { color: var(--muted); }
+:where(:root[data-theme="dark"]) .deep-kicker { color: var(--muted); }
+:where(:root[data-theme="dark"]) .deep-lead { border-left: 4px solid color-mix(in srgb, var(--era) 60%, var(--paper)); background: color-mix(in srgb, var(--era) 7%, var(--paper)); }
+:where(:root[data-theme="dark"]) .debate h3 { color: color-mix(in srgb, var(--era) 50%, white); }
+:where(:root[data-theme="dark"]) .view { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .debate-now { background: #18212d; }
+:where(:root[data-theme="dark"]) .debate-now b { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .source { background: #2b261d; border: 2px solid #39342a; }
+:where(:root[data-theme="dark"]) .source blockquote { border-left: 3px solid #705f43; }
+:where(:root[data-theme="dark"]) .source figcaption { color: var(--muted); }
+:where(:root[data-theme="dark"]) .source details summary, :where(:root[data-theme="dark"]) .card-deep summary { color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .shadow-item { background: #232127; }
+:where(:root[data-theme="dark"]) .card-deep details { background: var(--paper); border: 2px solid color-mix(in srgb, var(--era) 30%, var(--paper)); }
+:where(:root[data-theme="dark"]) .card-deep summary small { color: var(--muted); }
+:where(:root[data-theme="dark"]) body.grown { background-image: none; }
+:where(:root[data-theme="dark"]) .sp-main, :where(:root[data-theme="dark"]) .sp-sub, :where(:root[data-theme="dark"]) .deep-fig { background: var(--paper-2); }
+:where(:root[data-theme="dark"]) .photo-zoom { background: #2c2923; }
+:where(:root[data-theme="dark"]) .sp-main figcaption, :where(:root[data-theme="dark"]) .sp-sub figcaption, :where(:root[data-theme="dark"]) .deep-fig figcaption { color: var(--muted); }
+:where(:root[data-theme="dark"]) .ctile-art.ctile-photo { border: 2px solid color-mix(in srgb, var(--era) 35%, var(--paper)); background: #2c2923; }
+:where(:root[data-theme="dark"]) .bigcard-photo img { background: #2c2923; border: 3px solid color-mix(in srgb, var(--era) 30%, var(--paper)); }
+:where(:root[data-theme="dark"]) .bigcard-photo figcaption { color: var(--muted); }
+:where(:root[data-theme="dark"]) .bigcard-photo small a { color: inherit; }
+:where(:root[data-theme="dark"]) .yt-frame { background: #000; }
+:where(:root[data-theme="dark"]) .yt-now b { color: color-mix(in srgb, var(--red) 62%, white); }
+:where(:root[data-theme="dark"]) .yt-group { color: var(--muted); }
+:where(:root[data-theme="dark"]) .yt-item { background: var(--paper-2); color: inherit; }
+:where(:root[data-theme="dark"]) .yt-item:hover { background: var(--paper); }
+:where(:root[data-theme="dark"]) .yt-item.on { background: #2b1717; }
+:where(:root[data-theme="dark"]) .yt-thumb { background: #2e2e2e; }
+:where(:root[data-theme="dark"]) .yt-play { background: rgba(220, 0, 0, 0.88); color: #fff; }
+:where(:root[data-theme="dark"]) .yt-len { background: rgba(0, 0, 0, 0.78); color: #fff; }
+:where(:root[data-theme="dark"]) .yt-meta small { color: var(--muted); }
+:where(:root[data-theme="dark"]) .yt-en { background: #18212d; color: color-mix(in srgb, var(--blue) 62%, white); }
+:where(:root[data-theme="dark"]) .set-opts button { background: var(--paper-2); color: var(--ink); }
+:where(:root[data-theme="dark"]) .set-opts button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+:where(:root[data-theme="dark"]) .set-sample { background: var(--paper-2); }
+/* DARK-AUTO-END */
