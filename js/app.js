@@ -153,6 +153,58 @@
   const deepOf = id => (window.DEEP && window.DEEP[id]) || null;
   const readMin = text => Math.max(1, Math.round(text.replace(/\s/g, '').length / 500));
 
+  // ---------- 유튜브 영상 (js/videos.js를 처음 필요할 때 불러와요) ----------
+  // VIDEOS = { era: { 시대: { all, slides } }, nation: { 이야기: [...] }, exam: { 단원: [...] } }
+  let videosLoad = null;
+  function loadVideos() {
+    if (window.VIDEOS) return Promise.resolve(window.VIDEOS);
+    if (!videosLoad) {
+      videosLoad = new Promise(resolve => {
+        const s = document.createElement('script');
+        s.src = 'js/videos.js';
+        s.onload = () => resolve(window.VIDEOS || null);
+        s.onerror = () => { videosLoad = null; s.remove(); resolve(null); };
+        document.head.appendChild(s);
+      });
+    }
+    return videosLoad;
+  }
+  const ytItem = v => `<li><button type="button" class="yt-item" data-yt="${esc(v.id)}" data-yt-title="${esc(v.t)}">
+      <span class="yt-thumb"><img src="https://i.ytimg.com/vi/${esc(v.id)}/mqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="yt-play" aria-hidden="true">▶</span>${v.len ? `<span class="yt-len">${esc(v.len)}</span>` : ''}</span>
+      <span class="yt-meta"><span class="yt-title">${esc(v.t)}</span><small>${esc(v.ch)}${v.en ? ' · <span class="yt-en">영어</span>' : ''}</small></span>
+    </button></li>`;
+  const ytGroup = (label, list) => list && list.length
+    ? `${label ? `<h3 class="yt-group">${label}</h3>` : ''}<ul class="yt-list">${list.map(ytItem).join('')}</ul>` : '';
+  // 영상 상자 틀: 위에 재생 자리, 아래에 목록(body)
+  const videoPanel = body => `<section class="panel video-panel" data-video-panel>
+      <h2>📺 영상으로 더 보기</h2>
+      <p class="hint">어른을 위한 강의·교양 영상이에요. 누르면 이 자리에서 재생돼요. 아이와 함께 볼 때는 먼저 살펴봐 주세요.</p>
+      <div class="yt-player" hidden></div>
+      ${body}
+    </section>`;
+  function playVideo(btn) {
+    const panel = btn.closest('[data-video-panel]');
+    const slot = panel && panel.querySelector('.yt-player');
+    if (!slot) return;
+    const id = btn.dataset.yt;
+    const title = btn.dataset.ytTitle || '';
+    stopSpeak();
+    slot.hidden = false;
+    slot.innerHTML = `<div class="yt-frame"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1" title="${esc(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+      <p class="yt-now"><span><b>재생 중</b> ${esc(title)}</span>
+        <span class="yt-now-tools"><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}" target="_blank" rel="noopener">유튜브에서 보기 ↗</a><button type="button" class="mini" data-yt-close>닫기 ✕</button></span></p>`;
+    panel.querySelectorAll('.yt-item').forEach(b => b.classList.toggle('on', b === btn));
+    slot.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+  }
+  function closeVideo(btn) {
+    const panel = btn.closest('[data-video-panel]');
+    const slot = panel && panel.querySelector('.yt-player');
+    if (!slot) return;
+    slot.innerHTML = '';
+    slot.hidden = true;
+    panel.querySelectorAll('.yt-item.on').forEach(b => b.classList.remove('on'));
+  }
+
   function setTrack(t) {
     if (TRACKS[t] && state.track !== t) { state.track = t; save(); }
   }
@@ -525,6 +577,7 @@
       ${modeSwitch(e.color, 'data-era-mode')}
       <section id="story" class="story" aria-live="polite"></section>
       <div id="deep-panels"></div>
+      <div id="era-videos"></div>
       <section class="panel compare ${e.track}">
         <h2>${compareTitle}</h2>
         <ul class="compare-list">
@@ -556,6 +609,7 @@
       </div>`;
     renderStory(false);
     renderDeepPanels();
+    renderEraVideos();
     renderEraCards();
   }
 
@@ -617,6 +671,29 @@
         <button class="btn btn-green" type="button" data-action="slide-next">${last ? (grown() ? '다 읽었어요 🎖️' : '탐험 완료 🎖️') : '다음 ▶'}</button>
       </div>`;
     if (focusNext) box.querySelector('[data-action="slide-next"]').focus({ preventScroll: true });
+    renderSlideVideos();
+  }
+
+  // 시대 영상: 지금 슬라이드 주제 영상 + 시대 전체 영상 (재생 중인 영상은 슬라이드를 넘겨도 그대로)
+  function renderEraVideos() {
+    const box = document.getElementById('era-videos');
+    if (!box || !eraState) return;
+    const e = eraState.era;
+    loadVideos().then(V => {
+      const v = V && V.era && V.era[e.id];
+      if (!eraState || eraState.era !== e || !document.getElementById('era-videos')) return;
+      if (!v) { box.innerHTML = ''; return; }
+      box.innerHTML = videoPanel(`<div id="slide-videos"></div>${ytGroup(`${esc(e.name)} 전체`, v.all)}`);
+      renderSlideVideos();
+    });
+  }
+  function renderSlideVideos() {
+    const box = document.getElementById('slide-videos');
+    if (!box || !eraState || !window.VIDEOS) return;
+    const { era: e, idx } = eraState;
+    const v = window.VIDEOS.era && window.VIDEOS.era[e.id];
+    const list = v && v.slides && v.slides[idx];
+    box.innerHTML = ytGroup(`이 슬라이드: ${esc(e.slides[idx].title)}`, list);
   }
 
   // 🎓 어른용일 때만 시대 전체에 대한 쟁점·사료·명암 상자를 보여 줘요
@@ -1165,6 +1242,7 @@
     me, save, esc, shuffle, pick, sfx, confetti, openModal, closeModal, focusHeading,
     award, cardTile, rewardCards, speakBtn, stopSpeak, cardById, eraById,
     grown, praise, wrongMsg, storyMode, setStoryMode, STORY_MODES, loadDeep, readMin,
+    loadVideos, videoPanel, ytGroup,
   };
 
   // ---------- 이벤트 ----------
@@ -1181,6 +1259,11 @@
       sfx.tap();
       return;
     }
+
+    const yt = t.closest('[data-yt]');
+    if (yt) { playVideo(yt); return; }
+    const ytClose = t.closest('[data-yt-close]');
+    if (ytClose) { closeVideo(ytClose); return; }
 
     const modeEl = t.closest('[data-era-mode]');
     if (modeEl && eraState) {

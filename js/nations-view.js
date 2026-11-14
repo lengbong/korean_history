@@ -263,9 +263,17 @@
         ${era ? `<aside class="nbox korea"><h2>🐯 그때 우리나라에서는?</h2><p>${esc(ep.korea.text)}</p>
           <a class="chip chip-link" href="#/era/${era.id}" style="--era:${era.color}">🐯 ${esc(era.short)} 보러 가기 ›</a></aside>` : ''}
       </article>
+      <div id="nstory-videos"></div>
       <div class="slide-nav nstory-nav" id="nstory-nav"></div>`;
     renderStoryText();
     renderStoryNav();
+    // 이 이야기의 유튜브 영상 (불러오는 동안 다른 이야기로 옮겼으면 그대로 둬요)
+    A.loadVideos().then(V => {
+      const list = V && V.nation && V.nation[ep.id];
+      const box = document.getElementById('nstory-videos');
+      if (!box || !list || !story || story.ep !== ep) return;
+      box.innerHTML = A.videoPanel(A.ytGroup('', list));
+    });
   }
 
   function renderStoryText() {
